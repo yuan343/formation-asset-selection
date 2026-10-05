@@ -43,7 +43,99 @@ const assets = [
   }
 ];
 
+const realCases = [
+  {
+    id: "HBM4003",
+    candidateId: "HBM4003-MCRC",
+    asset: "HBM4003 / Porustobart",
+    target: "CTLA-4",
+    modality: "全人源重链抗体",
+    stage: "Phase 1b/2",
+    rights: "大中华区由和铂体系推进；境外由合作NewCo推进",
+    currentUse: "黑色素瘤、MSS转移性结直肠癌、肝癌、神经内分泌肿瘤等联合治疗研究",
+    question: "已有临床信号能否通过人群收窄与试验设计，转化为可确认的临床获益？",
+    verdict: "值得深入评估",
+    verdictClass: "evaluate",
+    recommendation: "优先验证无肝转移MSS结直肠癌中的富集策略，而不是继续泛实体瘤扩张",
+    probability: "45–60%",
+    probabilityLabel: "下一阶段达到预设临床目标",
+    confidence: 58,
+    evidenceCutoff: "2026-10-05",
+    knownFacts: [
+      "公开Ⅱ期队列纳入24名经过至少两线治疗的无肝转移MSS转移性结直肠癌患者。",
+      "23名可评价患者中，ORR 34.8%、DCR 60.9%，中位PFS 4.2个月。",
+      "未观察到4级或致死性TEAE；治疗相关严重不良事件为37.5%。",
+      "公司当前公开管线同时列出黑色素瘤、CRC、HCC与NEN等开发方向。"
+    ],
+    risks: [
+      "样本量小且为开放标签、非随机研究，效应可能被高估。",
+      "无肝转移是重要选择条件，但目前还不能确认是预测性因素还是预后性因素。",
+      "联合治疗贡献、CTLA-4剂量与安全性的独立作用仍需拆分。"
+    ],
+    adjustments: [
+      { lever: "患者人群", action: "预设无肝转移分层，并探索Treg、免疫浸润及相关标志物。", impact: "+6–12pp", reason: "减少人群异质性，验证现有疗效信号是否可重复。" },
+      { lever: "适应症顺序", action: "先聚焦信号最清晰的MSS mCRC亚群，再决定是否扩展其他实体瘤。", impact: "+4–8pp", reason: "把有限样本和资金集中到证据收敛最快的场景。" },
+      { lever: "试验设计", action: "引入对照或严格历史基准，并对肝转移状态进行前瞻性分层。", impact: "提高置信度", reason: "排除患者选择造成的假阳性，并获得可决策的效应量。" },
+      { lever: "剂量与联合", action: "继续比较暴露、Treg变化、疗效与免疫毒性的关系。", impact: "+2–6pp", reason: "确认联合方案的净效益是否足以覆盖严重不良事件负担。" }
+    ],
+    nextExperiment: "开展带预设分层和明确成功阈值的确认性扩展队列",
+    stopRule: "若富集人群未达到预设ORR/PFS方向，或安全负担使净临床获益不足，则停止当前适应症路径。",
+    sources: [
+      { title: "和铂：HBM4003联合替雷利珠单抗Ⅱ期结果", url: "https://www.harbourbiomed.com/news/249.html", tier: "公司公开结果" },
+      { title: "ClinicalTrials.gov · NCT05167071", url: "https://clinicaltrials.gov/study/NCT05167071", tier: "试验登记" },
+      { title: "和铂当前肿瘤管线", url: "https://www.harbourbiomed.com/therapeutics/immunooncology", tier: "公司管线" }
+    ]
+  },
+  {
+    id: "HBM1020",
+    candidateId: "HBM1020-ENRICH",
+    asset: "HBM1020",
+    target: "B7H7 / HHLA2",
+    modality: "全人源单克隆抗体",
+    stage: "Phase 1",
+    rights: "公司公开管线标示为全球权益",
+    currentUse: "晚期实体瘤；公司材料提出2L+ NSCLC与透明细胞肾癌方向",
+    question: "早期稳定疾病信号能否通过生物标志物富集，转化为可重复的客观缓解？",
+    verdict: "具有挽救与重构潜力",
+    verdictClass: "recoverable",
+    recommendation: "暂不做泛实体瘤扩张；优先验证HHLA2高表达、PD-L1阴性或PD-1耐药人群",
+    probability: "30–45%",
+    probabilityLabel: "下一阶段观察到可确认疗效信号",
+    confidence: 39,
+    evidenceCutoff: "2026-10-05",
+    knownFacts: [
+      "公开Ⅰ期剂量递增研究评估安全性、PK/PD和初步抗肿瘤活性。",
+      "15名接受治疗后肿瘤评估的患者中，7名达到疾病稳定。",
+      "其中2名患者的肿瘤分别缩小11%和25%，尚未形成明确客观缓解证据。",
+      "公开信息显示初步安全性和耐受性良好。"
+    ],
+    risks: [
+      "样本量很小，且跨瘤种混合，无法判断真正敏感人群。",
+      "疾病稳定可能来自自然病程，不能等同于药物活性。",
+      "B7H7表达阈值、空间分布和预测性价值尚未得到临床验证。"
+    ],
+    adjustments: [
+      { lever: "生物标志物", action: "前瞻性检测HHLA2表达并保留基线及治疗中活检。", impact: "+5–10pp", reason: "直接验证靶点表达是否能够预测药效。" },
+      { lever: "患者人群", action: "优先研究PD-L1阴性或PD-1/PD-L1治疗后耐药人群。", impact: "+4–8pp", reason: "与候选机制假设一致，减少无关人群稀释信号。" },
+      { lever: "适应症", action: "先比较NSCLC与透明细胞肾癌的表达率、可入组性及早期信号。", impact: "重新排序", reason: "不要在没有敏感人群证据时同时铺开多个实体瘤。" },
+      { lever: "开发顺序", action: "先完成小型富集扩展队列，再决定单药扩大或进入联合。", impact: "降低风险", reason: "用较低成本回答单药是否存在机制一致的效应。" }
+    ],
+    nextExperiment: "开展带HHLA2表达分层和配对活检的富集扩展队列",
+    stopRule: "若足够暴露下仍未观察到机制一致的生物标志物变化或客观缓解，则停止单药扩展。",
+    sources: [
+      { title: "和铂：HBM1020 ESMO 2024临床数据", url: "https://www.harbourbiomed.com/news/1429.html", tier: "公司公开结果" },
+      { title: "ClinicalTrials.gov · NCT05824663", url: "https://clinicaltrials.gov/study/NCT05824663", tier: "试验登记" },
+      { title: "和铂2026路演材料", url: "https://www.harbourbiomed.com/upload/202604/1776889891598235035.pdf", tier: "公司投资者材料" },
+      { title: "和铂当前肿瘤管线", url: "https://www.harbourbiomed.com/therapeutics/immunooncology", tier: "公司管线" }
+    ]
+  }
+];
+
 const evidence = [
+  { tag: "P", asset: "HBM4003", claim: "无肝转移MSS mCRCⅡ期公开队列中，23名可评价患者ORR为34.8%、DCR为60.9%，中位PFS为4.2个月。", source: "和铂公开结果 / NCT05167071", quality: "公开临床结果", updated: "2026-10" },
+  { tag: "P", asset: "HBM4003", claim: "小样本、开放标签且非随机，现有结果只能支持确认性研究假设。", source: "试验设计审计", quality: "模型解释", updated: "2026-10" },
+  { tag: "P", asset: "HBM1020", claim: "Ⅰ期公开数据中15名可评价患者有7名疾病稳定，两名肿瘤缩小11%和25%。", source: "和铂ESMO 2024 / NCT05824663", quality: "公开临床结果", updated: "2026-10" },
+  { tag: "E", asset: "HBM1020", claim: "HHLA2高表达、PD-L1阴性或PD-1耐药人群富集属于待验证的开发假设。", source: "v0.9案例推演", quality: "研究性假设", updated: "2026-10" },
   { tag: "F", asset: "Formation 运营模式", claim: "资产选择、开发策略与临床执行属于连续决策链。", source: "Formation 官网与公开材料", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "适应症全景分析", claim: "原始数据需标准化；同行评议文献通常优先于注册库中的结果摘要。", source: "Formation 工程博客", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "人类遗传学", claim: "遗传学分析进入每项资产评估，并保留人工检查点。", source: "Formation 遗传学工作流", quality: "一级来源", updated: "2026-10" },
@@ -150,15 +242,20 @@ let step1State = cloneStep1(step1Presets[step1PresetKey]);
 
 const viewTitles = {
   workspace: "决策总览",
+  cases: "真实案例试跑",
+  radar: "STEP 0 · 机会雷达",
   recoverability: "STEP 1 · 海选池",
-  ranking: "STEP 2 · 候选资产分层与优先级排序",
+  ranking: "STEP 2 · 科学预测与投资决策",
   scenario: "STEP 3 · 假设场景与开发方案优化",
+  registry: "预测登记册",
   evidence: "证据与审计"
 };
 
 let currentView = "workspace";
+let selectedRealCaseId = "HBM4003";
 let selectedAssetId = assets[0].id;
 let selectedStep2Id = "GUSA-FOCUS";
+let step2Section = "prediction";
 let step2ResourceProfile = "base";
 let step2Lens = "priority";
 let selectedDimensionId = "science";
@@ -170,6 +267,8 @@ let selectedStep3ScenarioId = "";
 let step3Params = { evidence:72, enrichment:68, execution:61, riskTolerance:52 };
 const step3Writebacks = {};
 let evidenceFilter = "ALL";
+let radarFilter = "ALL";
+let registryAsset = "HBM4003";
 
 const root = document.querySelector("#view-root");
 const pageTitle = document.querySelector("#page-title");
@@ -189,6 +288,32 @@ function summaryCards() {
       <div class="panel summary-card" style="--card-color:var(--amber)"><span>需要补充证据</span><strong>${evaluate}</strong><small>触发专项研究</small></div>
       <div class="panel summary-card" style="--card-color:var(--red)"><span>触发硬性否决</span><strong>1</strong><small>建议暂不继续</small></div>
     </div>`;
+}
+
+const opportunitySignals = [
+  { id:"SIG-001", asset:"Undisclosed asset A", type:"silence", source:"公司管线 / 财报", signal:"连续两个披露周期不再出现", change:"提及频率 -100%", strength:82, confidence:71, action:"进入 STEP 1", why:"更像战略降优先级，而非已经确认的科学失败。" },
+  { id:"SIG-002", asset:"Target class B", type:"science", source:"论文 / 人体遗传学", signal:"新增靶点—疾病人体因果支持", change:"证据强度上升", strength:78, confidence:67, action:"建立候选资产宇宙", why:"新证据可能改变既往对同机制资产的判断。" },
+  { id:"SIG-003", asset:"Returned-rights asset C", type:"transaction", source:"授权交易 / 公司公告", signal:"合作权利返还原持有人", change:"交易状态变化", strength:74, confidence:83, action:"核查权属与失败原因", why:"权利回流可能创造新的交易窗口，但不代表资产自动可救。" },
+  { id:"SIG-004", asset:"Competitor program D", type:"competition", source:"临床试验 / 监管", signal:"同机制竞品因剂量相关安全问题终止", change:"类别风险上升", strength:69, confidence:76, action:"触发同类资产风险复核", why:"需要区分 class effect 与 molecule-specific issue。" },
+  { id:"SIG-005", asset:"Paused program E", type:"status", source:"ClinicalTrials.gov", signal:"状态长期停留且终点发生变化", change:"试验状态异常", strength:61, confidence:58, action:"补充公司与监管证据", why:"当前只能形成研究触发器，不能直接判断为失败资产。" }
+];
+
+const radarTypes = {
+  ALL:"全部信号", silence:"沉默 / 语气", science:"科学证据", transaction:"交易与权利", competition:"竞争变化", status:"试验状态"
+};
+
+function renderRadar() {
+  const rows = radarFilter === "ALL" ? opportunitySignals : opportunitySignals.filter(item => item.type === radarFilter);
+  const high = opportunitySignals.filter(item => item.strength >= 75).length;
+  root.innerHTML = `<div class="view-heading radar-heading"><div><p class="eyebrow">STEP 0 · Opportunity Radar</p><h2>先发现变化，再决定哪些资产值得进入海选</h2><p>目标是提高召回率：持续观察公开世界中的新增信息、沉默、语气和状态变化。当前均为结构演示，不代表已接入实时数据。</p></div><span class="draft-badge">演示信号 · 非实时监控</span></div>
+    <div class="radar-principle"><div><b>STEP 0 优化 Recall</b><span>尽量不漏掉值得看的机会</span></div><i></i><div><b>STEP 1 优化 Precision</b><span>尽量不把不合格资产送入正式尽调</span></div></div>
+    <div class="summary-strip"><div class="panel summary-card" style="--card-color:var(--blue)"><span>监测信号</span><strong>${opportunitySignals.length}</strong><small>当前演示样本</small></div><div class="panel summary-card" style="--card-color:var(--teal)"><span>高强度机会</span><strong>${high}</strong><small>信号强度 ≥75</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>数据来源</span><strong>7</strong><small>试验、论文、监管、公司等</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>直接形成淘汰</span><strong>0</strong><small>弱信号只触发研究</small></div></div>
+    <section class="panel radar-workspace"><div class="panel-head"><div><h2>机会信号队列</h2><p>分析“说了什么”，也分析“突然不再说什么”</p></div><div class="radar-filters">${Object.entries(radarTypes).map(([key,label])=>`<button data-radar-filter="${key}" class="${radarFilter===key?"active":""}">${label}</button>`).join("")}</div></div><div class="radar-list">${rows.map(item=>`<article class="radar-card"><div class="radar-score"><strong>${item.strength}</strong><span>信号强度</span></div><div class="radar-main"><div><span class="signal-type signal-${item.type}">${radarTypes[item.type]}</span><small>${item.id} · ${item.source}</small></div><h3>${item.asset}</h3><p>${item.signal}</p><em>${item.change}</em></div><div class="radar-reason"><span>为什么值得看</span><p>${item.why}</p><small>来源置信度 ${item.confidence}%</small></div><div class="radar-action"><span>下一步</span><strong>${item.action}</strong><button data-view="recoverability">打开海选逻辑</button></div></article>`).join("")}</div></section>
+    <section class="radar-source-map"><article class="panel"><span>01</span><h3>持续监听</h3><p>试验、论文、监管、公司、交易、遗传学和竞争管线。</p></article><article class="panel"><span>02</span><h3>计算变化</h3><p>新增、消失、语气、频率、状态和相互矛盾的信息。</p></article><article class="panel"><span>03</span><h3>生成触发器</h3><p>信号只决定是否进入研究，不直接决定资产好坏。</p></article><article class="panel"><span>04</span><h3>进入 STEP 1</h3><p>由海选规则判断 Fatal、Unknown、Recoverable 或 Worth Diligence。</p></article></section>`;
+  wrapElementInDisclosure(document.querySelector(".radar-workspace"), "查看全部机会信号", "信号只决定是否进入研究，不直接决定资产好坏。", false);
+  wrapElementInDisclosure(document.querySelector(".radar-source-map"), "查看机会雷达如何工作", "持续监听 → 计算变化 → 生成触发器 → 进入海选。", false);
+  document.querySelectorAll("[data-radar-filter]").forEach(button=>button.addEventListener("click",()=>{radarFilter=button.dataset.radarFilter;renderRadar();}));
+  document.querySelectorAll('.radar-action [data-view]').forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.view)));
 }
 
 function assetTable(list = assets) {
@@ -239,32 +364,24 @@ function overviewEvidenceItem(label, text, type, meta="") {
   return `<li><span class="evidence-kind kind-${type}">${label}</span><div><strong>${text}</strong>${meta ? `<small>${meta}</small>` : ""}</div></li>`;
 }
 
+const journeyQuestions = [
+  { no:"01", step:"STEP 0", title:"哪里出现了机会？", answer:"从公开信息中发现新增、沉默、权利变化和异常信号。", output:"输出：研究触发器", view:"radar" },
+  { no:"02", step:"STEP 1", title:"这个资产还有没有救？", answer:"区分科学失败、分子缺陷与可以调整的开发问题。", output:"输出：淘汰 / 待补证据 / 可救 / 深入评估", view:"recoverability" },
+  { no:"03", step:"STEP 2A", title:"重新开发会不会成功？", answer:"沿着暴露、靶点结合、机制、疗效和安全性形成概率区间。", output:"输出：PoS区间 + 关键未知项", view:"ranking", section:"prediction" },
+  { no:"04", step:"STEP 2B", title:"值不值得优先投入？", answer:"把成功概率、价值、时间、成本和资源约束放在一起排序。", output:"输出：资源优先级 + 行动建议", view:"ranking", section:"decision" },
+  { no:"05", step:"STEP 3", title:"入选后应该怎么调整？", answer:"比较适应症、人群、剂量、联合和试验设计等候选方案。", output:"输出：调整建议 + 下一最佳实验", view:"scenario" }
+];
+
+function disclosure(title, summary, content, open=false, className="") {
+  return `<details class="logic-disclosure ${className}" ${open ? "open" : ""}><summary><div><strong>${title}</strong><span>${summary}</span></div><i aria-hidden="true"></i></summary><div class="disclosure-body">${content}</div></details>`;
+}
+
 function renderWorkspace() {
   const selected = assets.find(a => a.id === selectedAssetId) || assets[0];
-  const { ranked, top, recommended, assetRecord, supportingEvidence, experiment } = getDecisionOverviewState();
-  const posDelta = recommended.pos - top.pos;
-  const timeDelta = recommended.timeMonths - top.timeMonths;
-  const topFour = ranked.slice(0,4);
-  const lowConfidence = ranked.filter(item => item.confidence < 55);
-  const writtenBack = Object.keys(step3Writebacks).length;
-  const directEvidenceHTML = supportingEvidence.map(item => overviewEvidenceItem(`[${item.tag}]`, item.claim, "source", `${item.source} · ${item.quality} · ${item.updated}`)).join("");
-  root.innerHTML = `<section class="overview-hero panel">
-      <div class="overview-hero-main"><div class="overview-kicker"><span>当前决策建议</span><em>演示结论 · 非真实投资建议</em></div><h2>优先推进 ${top.asset} × ${top.plan}</h2><p>在“${step2Profiles[step2ResourceProfile].label} / ${step2LensLabels[step2Lens]}”下排名第 1；系统建议<strong>${top.action}</strong>，并优先验证“${recommended.name}”。</p><div class="overview-actions"><button data-overview-view="ranking" class="primary-button">查看完整排序</button><button data-overview-view="scenario" data-overview-scenario="${top.parentId || top.id}" class="secondary-button">查看方案优化</button></div></div>
-      <div class="overview-verdict"><span>最终建议</span><strong>${top.action}</strong><small>${top.confidence >= 70 ? "中高" : top.confidence >= 55 ? "中等" : "偏低"}置信度 · ${top.confidence}%</small><div><b>模型版本</b><em>v0.7-demo</em><b>数据状态</b><em>演示输入</em></div></div>
-    </section>
-    <div class="overview-kpi-grid"><article class="panel"><span>综合优先级</span><strong>${top.priority}<small>/100</small></strong><p>STEP 2 当前排序第 1</p></article><article class="panel"><span>成功概率</span><strong>${top.pos}<small>%</small></strong><p>按阶段与方案重算</p></article><article class="panel"><span>场景改善</span><strong>${posDelta>=0?"+":""}${posDelta}<small>pp PoS</small></strong><p>时间 ${timeDelta>=0?"+":""}${timeDelta} 月</p></article><article class="panel"><span>证据确定度</span><strong>${top.confidence}<small>%</small></strong><p>${top.missing} 项缺失 · ${top.conflicts} 项冲突</p></article></div>
-    <section class="panel decision-chain"><div class="overview-section-head"><div><p class="eyebrow">结论如何形成</p><h2>从事实与假设，逐层走到行动建议</h2></div><span>每一层均可返回原步骤复核</span></div><div class="decision-chain-grid">
-      <button data-overview-view="evidence"><i>01</i><span>证据输入</span><strong>${supportingEvidence.length} 条直接关联记录</strong><small>${top.missing} 项缺失 / ${top.conflicts} 项冲突</small></button>
-      <button data-overview-view="recoverability"><i>02</i><span>STEP 1 · 是否值得研究</span><strong>${assetRecord?.status || "通过海选"}</strong><small>${top.gate}进入候选池</small></button>
-      <button data-overview-view="ranking"><i>03</i><span>STEP 2 · 是否优先投入</span><strong>排名 1 · ${top.priority}/100</strong><small>${top.action}</small></button>
-      <button data-overview-view="scenario" data-overview-scenario="${top.parentId || top.id}"><i>04</i><span>STEP 3 · 怎样开发</span><strong>${recommended.name}</strong><small>PoS ${posDelta>=0?"+":""}${posDelta}pp · 时间 ${timeDelta>=0?"+":""}${timeDelta}月</small></button>
-      <div class="decision-chain-final"><i>05</i><span>当前结论</span><strong>${top.action}</strong><small>结论随新证据动态更新</small></div>
-    </div></section>
-    <div class="overview-two-column"><section class="panel portfolio-conclusion"><div class="overview-section-head"><div><p class="eyebrow">组合资源建议</p><h2>有限资源先投向哪里</h2></div><button data-overview-view="ranking" class="text-button">完整排序</button></div><div class="portfolio-list">${topFour.map((item,index)=>`<button data-overview-candidate="${item.id}"><span class="portfolio-rank">${index+1}</span><span class="portfolio-asset"><strong>${item.asset}</strong><small>${item.plan}</small></span><span class="portfolio-action"><b>${item.action}</b><small>${item.tier} · ${item.priority}/100</small></span><span class="portfolio-confidence"><b>${item.confidence}%</b><small>置信度</small></span></button>`).join("")}</div>${lowConfidence.length?`<div class="portfolio-note"><b>${lowConfidence.length} 个候选结论置信度偏低</b><span>先补决定性证据，避免把信息不足误判为潜力不足。</span></div>`:""}</section>
-      <section class="panel evidence-support"><div class="overview-section-head"><div><p class="eyebrow">结论与证据支持</p><h2>事实、计算与假设分开</h2></div><button data-overview-view="evidence" class="text-button">证据审计</button></div><ul>${directEvidenceHTML}${overviewEvidenceItem("计算", `${top.asset} 在当前资源情景下排名第 1，综合优先级 ${top.priority}/100。`, "model", `STEP 2 · 置信度 ${top.confidence}%`)}${overviewEvidenceItem("假设", `${recommended.assumption}`, "assumption", `STEP 3 · 必须通过下一项实验验证`)}</ul></section></div>
-    <div class="overview-two-column"><section class="panel uncertainty-panel"><div class="overview-section-head"><div><p class="eyebrow">不确定性与反对证据</p><h2>什么可能改变当前结论</h2></div><span>不是结论脚注，而是决策条件</span></div><div class="uncertainty-grid"><article><span>最关键未知项</span><strong>${top.unknown}</strong></article><article><span>当前数据缺口</span><strong>${top.missing} 项缺失、${top.conflicts} 项冲突；真实数据接入后需重新计算。</strong></article><article><span>停止条件</span><strong>${recommended.stop}</strong></article></div></section>
-      <section class="panel next-decision-action"><p class="eyebrow">下一步行动</p><h2>${experiment.title}</h2><p>${experiment.answer}</p><div><span><b>预计周期</b>${experiment.time}</span><span><b>决策影响</b>${experiment.impact}</span><span><b>停止规则</b>${experiment.stop}</span></div><button data-overview-view="scenario" data-overview-scenario="${top.parentId || top.id}" class="secondary-button">查看场景与实验依据</button></section></div>
-    <section class="asset-pool-section"><div class="overview-section-head"><div><p class="eyebrow">向下查看资产</p><h2>海选资产池与当前判断</h2></div><span>${writtenBack ? `${writtenBack} 个 STEP 3 方案已回写排序` : "点击资产查看海选依据"}</span></div><div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>全部演示资产</h2><p>逐项复核当前海选判断</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div></section>`;
+  root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答五个问题</p><h2>把复杂的资产判断，变成一条可以顺着走完的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases" class="primary-button">查看真实案例试跑</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>方向验证期</strong><p>逻辑已成型，正在用少量真实案例校准规则、权重与建议质量。</p></aside></section>
+    <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到提出行动建议</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>反馈闭环</b><span>STEP 3 形成的新开发方案会回到 STEP 2A / 2B，重新计算成功概率与资源优先级。</span></div></section>
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>先用两个和铂公开案例检查这套逻辑</h2><p>HBM4003用来校准“有数据时系统会不会判断”；HBM1020用来验证“信息不足时系统会不会保持谨慎”。</p></div><div class="case-entry-assets">${realCases.map(item=>`<button data-real-case-entry="${item.id}"><span>${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}</div><button data-overview-view="cases" class="primary-button">进入案例试跑</button></section>
+    ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
 
@@ -277,8 +394,9 @@ function wireWorkspace() {
     document.querySelector("#asset-table-root").innerHTML = assetTable(filtered);
     wireAssetRows();
   };
-  search.addEventListener("input", refresh); stage.addEventListener("change", refresh); wireAssetRows();
+  if (search && stage) { search.addEventListener("input", refresh); stage.addEventListener("change", refresh); wireAssetRows(); }
   document.querySelectorAll("[data-overview-view]").forEach(button => button.addEventListener("click", () => {
+    if (button.dataset.step2SectionTarget) step2Section = button.dataset.step2SectionTarget;
     if (button.dataset.overviewScenario) {
       step3SelectedCandidateId = button.dataset.overviewScenario;
       step3Depth = "quick";
@@ -288,7 +406,12 @@ function wireWorkspace() {
   }));
   document.querySelectorAll("[data-overview-candidate]").forEach(button => button.addEventListener("click", () => {
     selectedStep2Id = button.dataset.overviewCandidate;
+    step2Section = "decision";
     switchView("ranking");
+  }));
+  document.querySelectorAll("[data-real-case-entry]").forEach(button => button.addEventListener("click", () => {
+    selectedRealCaseId = button.dataset.realCaseEntry;
+    switchView("cases");
   }));
 }
 
@@ -298,6 +421,32 @@ function wireAssetRows() {
     row.addEventListener("click", select);
     row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") select(); });
   });
+}
+
+function renderCaseStudies() {
+  const item = realCases.find(entry => entry.id === selectedRealCaseId) || realCases[0];
+  const other = realCases.find(entry => entry.id !== item.id);
+  root.innerHTML = `<div class="view-heading case-heading"><div><p class="eyebrow">Real-world pilot · 公开信息试跑</p><h2>不是展示资料，而是让真实案例走完整条决策逻辑</h2><p>事实、模型推断和调整情景分别标记。概率区间与增量为首轮研究性模拟，用于校准方法，不构成医学或投资建议。</p></div><span class="draft-badge">证据截止 ${item.evidenceCutoff}</span></div>
+    <div class="case-switcher" role="tablist" aria-label="选择真实案例">${realCases.map(entry=>`<button role="tab" data-real-case="${entry.id}" aria-selected="${entry.id===item.id}" class="${entry.id===item.id?"active":""}"><span>${entry.stage}</span><strong>${entry.asset}</strong><small>${entry.target}</small></button>`).join("")}</div>
+    <section class="case-verdict panel"><div class="case-identity"><span class="fact-label">公开事实</span><h2>${item.asset}</h2><p>${item.modality} · ${item.target} · ${item.stage}</p><small>当前公开方向：${item.currentUse}<br>${item.rights}</small></div><div class="case-main-verdict"><span>系统当前判断</span><strong class="case-status status-${item.verdictClass}">${item.verdict}</strong><p>${item.recommendation}</p></div><div class="case-probability"><span>研究性预测区间</span><strong>${item.probability}</strong><small>${item.probabilityLabel}</small><i><b style="width:${item.confidence}%"></b></i><em>证据置信度 ${item.confidence}%</em></div></section>
+    <section class="case-question panel"><span>这个案例真正要回答的问题</span><h2>${item.question}</h2><p>系统不会把“有信号”直接等同于“会成功”，而是继续寻找可以改变结论的开发变量。</p></section>
+    <section class="case-path"><div class="overview-section-head"><div><p class="eyebrow">案例如何走过系统</p><h2>先判断资格，再提出调整</h2></div><span>点击展开每一步依据</span></div>
+      ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">支持继续研究</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
+      ${disclosure("STEP 2A · 重新开发成功的可能性有多大？", `${item.probability}，置信度${item.confidence}%；这是下一阶段里程碑概率，不是最终上市概率。`, `<div class="case-calculation"><div><span>阶段先验</span><p>按${item.stage}和相应适应症设定基础区间。</p></div><i></i><div><span>证据修正</span><p>人体疗效、安全、机制一致性与样本质量向上或向下修正。</p></div><i></i><div><span>不确定性收缩</span><p>样本量、对照、缺失和冲突决定区间宽度与置信度。</p></div></div><div class="formula-note"><strong>当前输出</strong><span>${item.probabilityLabel}：${item.probability}。正式数值需要历史案例回测后重新校准。</span></div>`)}
+      ${disclosure("STEP 3 · 项目应该怎么调整？", item.recommendation, `<div class="adjustment-table"><div class="adjustment-head"><span>调整杠杆</span><span>建议</span><span>模拟影响</span><span>为什么</span></div>${item.adjustments.map(row=>`<div><b>${row.lever}</b><p>${row.action}</p><strong>${row.impact}</strong><small>${row.reason}</small></div>`).join("")}</div><div class="next-action case-next"><span>下一最佳实验</span><strong>${item.nextExperiment}</strong><small>停止规则 · ${item.stopRule}</small></div>`, true)}
+      ${disclosure("证据来源与边界", "每个事实回到公开来源；推断和模拟不得伪装成事实。", `<div class="source-link-list">${item.sources.map(source=>`<a href="${source.url}" target="_blank" rel="noreferrer"><span>${source.tier}</span><strong>${source.title}</strong><small>打开原始来源</small></a>`).join("")}</div><div class="evidence-boundary"><div><span class="fact-label">事实</span><p>来源中明确披露的人群、结果、阶段与权利信息。</p></div><div><span class="model-label">模型推断</span><p>海选结论、成功概率区间与证据置信度。</p></div><div><span class="scenario-label">情景建议</span><p>适应症、人群和试验调整，以及模拟概率变化。</p></div></div>`)}
+    </section>
+    <section class="case-footer panel"><div><p class="eyebrow">继续检查</p><h2>把案例带入同一套预测与场景计算</h2><p>查看它如何进入PoS因果链、场景重构和下一最佳实验。</p></div><button data-case-action="prediction" class="secondary-button">打开STEP 2A预测</button><button data-case-action="scenario" class="primary-button">打开STEP 3调整</button></section>`;
+  document.querySelectorAll("[data-real-case]").forEach(button=>button.addEventListener("click",()=>{selectedRealCaseId=button.dataset.realCase;renderCaseStudies();}));
+  document.querySelectorAll("[data-case-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.caseView)));
+  document.querySelectorAll("[data-case-action]").forEach(button=>button.addEventListener("click",()=>{
+    selectedStep2Id = item.candidateId;
+    if (button.dataset.caseAction === "prediction") { step2Section = "prediction"; switchView("ranking"); return; }
+    step3SelectedCandidateId = item.candidateId;
+    step3Depth = "quick";
+    resetStep3Params();
+    switchView("scenario");
+  }));
 }
 
 const hardGateDefinitions = {
@@ -462,7 +611,39 @@ function renderRecoverability() {
       <section class="panel assessment-section"><div class="assessment-section-head"><span class="section-number">1D</span><div><h2>自下而上的可救性评估</h2><p>不再手动填写三个总分；生物学、分子和开发重构空间均由底层指标加权计算。缺失数据降低置信度，不自动记为零。</p></div></div><div class="driver-groups">${driverGroupHTML("biology","生物学成立程度",result.biology)}${driverGroupHTML("molecule","分子可救性",result.molecule)}${driverGroupHTML("redesign","开发重构空间",result.redesign)}</div><div class="context-score-grid">${step1Slider("scores","evidence","证据置信度",step1State.scores.evidence,"按阶段适配")}${step1Slider("scores","actionability","执行可行性",step1State.scores.actionability,"科学潜力之外")}${step1Slider("scores","information","信息价值",step1State.scores.information,"下一项研究能否改变决策")}${step1Slider("scores","valueInflection","到达下一价值拐点的可行性",step1State.scores.valueInflection,"时间、成本与路径")}</div></section>
       <section class="panel assessment-section"><div class="assessment-section-head"><span class="section-number">1E</span><div><h2>系统提出的挽救假设</h2><p>默认由系统根据失败归因和底层指标提出；专家模式可以增删，用于情景模拟。每条路径必须附带验证指标和停止规则。</p></div></div><div class="rescue-grid">${Object.entries(rescueLabels).map(([key,label]) => `<label class="rescue-chip"><input data-step1-rescue="${key}" type="checkbox" ${step1State.rescue.includes(key)?"checked":""} ${disabled}/><span>${label}</span></label>`).join("")}</div></section>
     </div><aside id="step1-result" class="panel decision-console">${step1ResultHTML(result)}</aside></div>`;
+  simplifyStep1Layout();
   wireStep1Engine();
+}
+
+function wrapElementInDisclosure(element, title, summary, open=false) {
+  if (!element?.parentNode || element.closest(".logic-disclosure")) return;
+  const details = document.createElement("details");
+  details.className = "logic-disclosure";
+  details.open = open;
+  const summaryNode = document.createElement("summary");
+  summaryNode.innerHTML = `<div><strong>${title}</strong><span>${summary}</span></div><i aria-hidden="true"></i>`;
+  const body = document.createElement("div");
+  body.className = "disclosure-body";
+  element.parentNode.insertBefore(details, element);
+  details.append(summaryNode, body);
+  body.appendChild(element);
+}
+
+function simplifyStep1Layout() {
+  const layout = document.querySelector(".step1-layout");
+  const result = document.querySelector("#step1-result");
+  if (layout && result) {
+    layout.parentNode.insertBefore(result, layout);
+    result.classList.add("primary-result");
+    layout.classList.add("result-first");
+  }
+  const policy = document.querySelector(".screening-policy");
+  wrapElementInDisclosure(policy, "海选会产生哪五种去向？", "先区分淘汰、执行受阻、证据不足、潜力较低和通过海选。", false);
+  document.querySelectorAll(".assessment-builder > .assessment-section").forEach((section,index)=>{
+    const title = section.querySelector("h2")?.textContent || `判断层 ${index+1}`;
+    const note = section.querySelector("p")?.textContent || "展开查看详细规则与输入。";
+    wrapElementInDisclosure(section, `${["1A","1B","1C","1D","1E"][index]} · ${title}`, note, false);
+  });
 }
 
 function updateStep1Result() {
@@ -607,7 +788,9 @@ const step2Candidates = [
   { id:"SPRI-OA", asset:"Sprifermin", indication:"骨关节炎", plan:"结构 + 症状双终点方案", stage:"Phase 2", pos:43, futureValue:73, timeMonths:28, cost:55, commercialLife:8.2, strategic:69, confidence:72, stability:73, missing:4, conflicts:2, gate:"通过", drivers:["可复用的人体数据较充分","开发路径存在重新设计空间","患者与终点选择可直接去风险"], unknown:"结构改善能否转化为患者可感知获益。", template:"Phase 2：疗效一致性、终点与临床价值优先" },
   { id:"CD226-COMBO", asset:"anti-CD226", indication:"实体瘤亚组", plan:"生物标志物联合治疗", stage:"Preclinical", pos:29, futureValue:88, timeMonths:30, cost:47, commercialLife:13.8, strategic:76, confidence:54, stability:51, missing:8, conflicts:1, gate:"通过", drivers:["差异化免疫机制具有潜在上限","商业寿命和组合选择权较好","早期实验具有较高信息价值"], unknown:"人体转化、最佳联合对象与耐受性均未验证。", template:"临床前：靶点、转化证据与分子属性优先" },
   { id:"GUSA-BROAD", asset:"Gusacitinib", indication:"免疫炎症适应症", plan:"广泛人群原路径优化", stage:"Phase 2", pos:36, futureValue:80, timeMonths:30, cost:68, commercialLife:8.7, strategic:73, confidence:68, stability:62, missing:4, conflicts:2, gate:"通过", drivers:["沿用现有临床基础","可减少早期机制验证工作","目标人群规模相对更大"], unknown:"广泛人群可能稀释疗效信号并提高试验规模。", template:"Phase 2：临床信号、剂量、患者选择优先" },
-  { id:"BLKR-EXPAND", asset:"BLKR201", indication:"CNS 适应症 B", plan:"新适应症扩展", stage:"Phase 1", pos:31, futureValue:91, timeMonths:26, cost:46, commercialLife:12.1, strategic:84, confidence:49, stability:45, missing:9, conflicts:0, gate:"通过", drivers:["未来市场与未满足需求较高","特殊分子属性可能适配新疾病场景","具备平台数据复用空间"], unknown:"疾病相关性证据仍偏早期，排序对关键假设高度敏感。", template:"Phase 1：PK/PD、靶点结合与安全窗优先" }
+  { id:"BLKR-EXPAND", asset:"BLKR201", indication:"CNS 适应症 B", plan:"新适应症扩展", stage:"Phase 1", pos:31, futureValue:91, timeMonths:26, cost:46, commercialLife:12.1, strategic:84, confidence:49, stability:45, missing:9, conflicts:0, gate:"通过", drivers:["未来市场与未满足需求较高","特殊分子属性可能适配新疾病场景","具备平台数据复用空间"], unknown:"疾病相关性证据仍偏早期，排序对关键假设高度敏感。", template:"Phase 1：PK/PD、靶点结合与安全窗优先" },
+  { id:"HBM4003-MCRC", asset:"HBM4003", indication:"无肝转移MSS mCRC", plan:"生物标志物富集 + PD-1联合确认", stage:"Phase 2", pos:52, intervalLow:45, intervalHigh:60, futureValue:82, timeMonths:24, cost:58, commercialLife:10.4, strategic:79, confidence:58, stability:55, missing:5, conflicts:2, gate:"通过", drivers:["公开Ⅱ期队列观察到客观缓解信号","Treg清除与PD-1联合具有机制合理性","无肝转移人群提供可验证的富集假设"], unknown:"小样本非随机结果能否在前瞻性分层研究中重复。", template:"Phase 2：临床信号、患者选择、安全与对照证据优先", realCase:true },
+  { id:"HBM1020-ENRICH", asset:"HBM1020", indication:"HHLA2高表达实体瘤", plan:"PD-L1阴性/耐药人群富集扩展", stage:"Phase 1", pos:38, intervalLow:30, intervalHigh:45, futureValue:76, timeMonths:20, cost:37, commercialLife:12.8, strategic:75, confidence:39, stability:36, missing:8, conflicts:1, gate:"通过", drivers:["B7H7/HHLA2提供差异化免疫逃逸假设","早期安全性支持继续探索","生物标志物富集可以低成本验证核心假设"], unknown:"疾病稳定能否转化为机制一致、可重复的客观缓解。", template:"Phase 1：靶点表达、PK/PD、生物标志物与早期疗效优先", realCase:true }
 ];
 
 function getStep2CandidatePool() {
@@ -668,28 +851,83 @@ function renderStep2Detail(item) {
 
 function renderLogicDictionary() {
   const dimension = step2Dimensions.find(item => item.id === selectedDimensionId) || step2Dimensions[0];
-  return `<section class="logic-dictionary"><div class="logic-heading"><div><p class="eyebrow">完整逻辑覆盖</p><h2>9 个维度组织知识，73 条二级逻辑进入计算层</h2><p>九个维度不会直接相加；底层证据先转成 PoS、价值、时间、成本、商业寿命、战略价值和不确定性，再进入 Gate、价值模型和资源配置。</p></div><div class="logic-type-strip"><span><b>直接计算</b>数字、日期与 benchmark</span><span><b>规则引擎</b>阈值、Gate 与分层</span><span><b>预测模型</b>PoS、市场、入组与未来 SOC</span><span><b>专家判断</b>无法可靠形式化的事项</span></div></div><div class="dimension-grid">${step2Dimensions.map(item => `<button data-step2-dimension="${item.id}" class="dimension-card ${item.id===selectedDimensionId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.metrics.length} 条逻辑</small></button>`).join("")}</div><div class="dimension-detail panel"><div class="dimension-detail-head"><div><p class="eyebrow">维度 ${dimension.number}</p><h2>${dimension.name}</h2><p>${dimension.question}</p></div><span>${dimension.metrics.length} / ${dimension.metrics.length} 已纳入</span></div><div class="table-wrap"><table class="logic-table"><thead><tr><th>二级维度</th><th>处理方式</th><th>影响的核心变量</th><th>来源</th><th>公式状态</th></tr></thead><tbody>${dimension.metrics.map(metric => `<tr><td><strong>${metric.name}</strong></td><td>${metric.logic}</td><td>${metric.core}</td><td>${metric.origin}</td><td>${metric.status}</td></tr>`).join("")}</tbody></table></div></div><details class="panel formula-library"><summary><span><b>核心公式与结构式</b><small>共 ${step2Formulae.length} 条；明确区分行业方法与拟议公式</small></span><em>展开查看</em></summary><div class="formula-grid">${step2Formulae.map(([name,formula,status])=>`<article><b>${name}</b><code>${formula}</code><small>${status}</small></article>`).join("")}</div></details></section>`;
+  return disclosure("查看完整计算逻辑", "9个一级维度、73条二级逻辑和核心公式；默认收起，不影响主结论阅读。", `<section class="logic-dictionary"><div class="logic-heading"><div><p class="eyebrow">完整逻辑覆盖</p><h2>9 个维度组织知识，73 条二级逻辑进入计算层</h2><p>九个维度不会直接相加；底层证据先转成 PoS、价值、时间、成本、商业寿命、战略价值和不确定性，再进入 Gate、价值模型和资源配置。</p></div><div class="logic-type-strip"><span><b>直接计算</b>数字、日期与 benchmark</span><span><b>规则引擎</b>阈值、Gate 与分层</span><span><b>预测模型</b>PoS、市场、入组与未来 SOC</span><span><b>专家判断</b>无法可靠形式化的事项</span></div></div><div class="dimension-grid">${step2Dimensions.map(item => `<button data-step2-dimension="${item.id}" class="dimension-card ${item.id===selectedDimensionId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.metrics.length} 条逻辑</small></button>`).join("")}</div><div class="dimension-detail panel"><div class="dimension-detail-head"><div><p class="eyebrow">维度 ${dimension.number}</p><h2>${dimension.name}</h2><p>${dimension.question}</p></div><span>${dimension.metrics.length} / ${dimension.metrics.length} 已纳入</span></div><div class="table-wrap"><table class="logic-table"><thead><tr><th>二级维度</th><th>处理方式</th><th>影响的核心变量</th><th>来源</th><th>公式状态</th></tr></thead><tbody>${dimension.metrics.map(metric => `<tr><td><strong>${metric.name}</strong></td><td>${metric.logic}</td><td>${metric.core}</td><td>${metric.origin}</td><td>${metric.status}</td></tr>`).join("")}</tbody></table></div></div><details class="panel formula-library"><summary><span><b>核心公式与结构式</b><small>共 ${step2Formulae.length} 条；明确区分行业方法与拟议公式</small></span><em>展开查看</em></summary><div class="formula-grid">${step2Formulae.map(([name,formula,status])=>`<article><b>${name}</b><code>${formula}</code><small>${status}</small></article>`).join("")}</div></details></section>`);
+}
+
+const stagePredictionTemplates = {
+  Preclinical: { label:"临床前模板", weights:[["靶点与机制",32],["人类遗传学",22],["转化证据",20],["分子属性",18],["临床先例",8]] },
+  "Phase 1": { label:"Phase 1 模板", weights:[["PK / 暴露",26],["靶点结合",24],["安全窗",22],["机制证据",16],["早期疗效",12]] },
+  "Phase 2": { label:"Phase 2 模板", weights:[["临床疗效",30],["患者选择",22],["剂量反应",18],["安全与耐受",18],["终点与设计",12]] }
+};
+
+function calculatePrediction(candidate) {
+  const width = Math.max(7, Math.round((100-candidate.confidence)*.28 + candidate.missing*.75 + candidate.conflicts*2));
+  const low = candidate.intervalLow ?? Math.max(2,candidate.pos-width);
+  const high = candidate.intervalHigh ?? Math.min(95,candidate.pos+width);
+  const causal = [
+    ["有效暴露",clamp(Math.round(candidate.pos*1.18+24)),"药物能否达到所需组织和有效浓度"],
+    ["靶点结合",clamp(Math.round(candidate.pos*1.12+21-(candidate.stage==="Preclinical"?7:0))),"暴露是否转化为足够 Target Engagement"],
+    ["机制成立",clamp(Math.round(candidate.confidence*.62+25)),"靶点结合能否产生预期生物学变化"],
+    ["临床疗效",clamp(Math.round(candidate.pos*.96+7)),"生物学变化能否形成患者可感知获益"],
+    ["安全允许",clamp(Math.round(88-candidate.missing*2.8-candidate.conflicts*5)),"安全窗是否允许维持有效暴露"]
+  ];
+  const uncertainty = [
+    ["患者选择",candidate.plan.includes("生物标志物")?"中":"高"],
+    ["Target Engagement",candidate.stage==="Preclinical"?"高":"中"],
+    ["安全窗",candidate.conflicts>1?"高":"中"],
+    ["试验设计",candidate.missing>6?"高":"中"]
+  ];
+  return { low, high, causal, uncertainty };
+}
+
+function renderPredictionPanel(candidate) {
+  const prediction = calculatePrediction(candidate);
+  const template = stagePredictionTemplates[candidate.stage] || stagePredictionTemplates["Phase 2"];
+  const contrarianConditions = [
+    ["核心 Biology 在目标疾病中成立",candidate.confidence>=65?"强":"中"],
+    ["有效暴露与靶点结合能够建立",candidate.stage==="Preclinical"?"未知":"中"],
+    ["患者选择能放大真实效应",candidate.plan.includes("生物标志物")?"中":"未知"],
+    ["竞品失败原因不适用于本资产","中"],
+    ["安全窗足以支持目标剂量",candidate.conflicts>1?"弱":"中"]
+  ];
+  return `<section class="panel prediction-summary"><div class="prediction-title"><div><p class="eyebrow">STEP 2A · 会不会成功？</p><h2>${candidate.asset} · ${candidate.plan}</h2><p>先给概率区间和最关键未知项；需要时再展开因果链和权重。</p></div><label><span>预测对象</span><select id="step2-prediction-candidate" class="select-box">${getStep2CandidatePool().map(item=>`<option value="${item.id}" ${item.id===candidate.id?"selected":""}>${item.asset} · ${item.plan}</option>`).join("")}</select></label></div><div class="prediction-answer"><div><span>当前PoS</span><strong>${candidate.pos}%</strong><small>演示中位值</small></div><div><span>80%合理区间</span><strong>${prediction.low}–${prediction.high}%</strong><small>缺失与冲突决定区间宽度</small></div><div><span>证据置信度</span><strong>${candidate.confidence}%</strong><small>${candidate.missing}项缺失 · ${candidate.conflicts}项冲突</small></div><article><span>最可能改变结论的未知项</span><p>${candidate.unknown}</p></article></div></section>
+    ${disclosure("概率为什么是这个区间？", "沿着暴露 → 靶点结合 → 机制 → 疗效 → 安全性逐层检查。", `<div class="causal-chain">${prediction.causal.map(([name,value,note],index)=>`<article><span>0${index+1}</span><h3>${name}</h3><strong>${value}%</strong><i><b style="width:${value}%"></b></i><p>${note}</p></article>`).join("")}</div><div class="prediction-footnote">PoS不是五个节点的简单平均；正式版将按阶段先验、节点条件概率、证据强度和冲突传播。当前数值用于展示计算结构。</div>`)}
+    ${disclosure("阶段权重与不确定性", `${template.label}决定哪些证据更重要。`, `<div class="prediction-detail-pair"><section class="panel stage-template"><p class="eyebrow">动态权重</p><h2>${template.label}</h2>${template.weights.map(([name,value])=>`<div><span>${name}</span><i><b style="width:${value*2.7}%"></b></i><strong>${value}%</strong></div>`).join("")}</section><section class="panel uncertainty-source"><p class="eyebrow">不确定性来源</p><h2>区间为什么仍然较宽</h2>${prediction.uncertainty.map(([name,level])=>`<div><span>${name}</span><b class="uncertainty-${level}">${level}</b></div>`).join("")}<small>${candidate.missing}项缺失 · ${candidate.conflicts}项冲突</small></section></div>`)}
+    ${disclosure("反方情景：如果主流判断错了呢？", "同时保留Base Case与Minority Case，避免把行业共识当成事实。", `<div class="contrarian-grid"><article><span>Base Case</span><h3>当前最可能发生什么？</h3><p>${candidate.unknown}</p><strong>当前PoS ${candidate.pos}%</strong></article><article class="minority-case"><span>Contrarian Case</span><h3>什么必须成立？</h3>${contrarianConditions.map(([condition,level])=>`<div><p>${condition}</p><b>${level}</b></div>`).join("")}<strong>Contrarian Plausibility · ${candidate.confidence>=70?"中高":"中等"}</strong></article></div>`)}`;
+}
+
+function step2SectionTabs() {
+  return `<div class="step2-section-tabs"><button data-step2-section="prediction" class="${step2Section==="prediction"?"active":""}"><span>STEP 2A</span><b>科学与临床预测</b><small>会不会成功？</small></button><button data-step2-section="decision" class="${step2Section==="decision"?"active":""}"><span>STEP 2B</span><b>投资与组合决策</b><small>值不值得优先投入？</small></button></div>`;
+}
+
+function wireStep2Shared() {
+  document.querySelectorAll("[data-step2-section]").forEach(button=>button.addEventListener("click",()=>{step2Section=button.dataset.step2Section;renderRanking();}));
+  document.querySelectorAll("[data-step2-dimension]").forEach(button=>button.addEventListener("click",()=>{selectedDimensionId=button.dataset.step2Dimension;renderRanking();}));
+  const selector = document.querySelector("#step2-prediction-candidate");
+  if (selector) selector.addEventListener("change",event=>{selectedStep2Id=event.target.value;renderRanking();});
 }
 
 function renderRanking() {
+  document.querySelectorAll(".pipeline-step").forEach(btn => {
+    const sectionMatch = !btn.dataset.step2SectionTarget || btn.dataset.step2SectionTarget === step2Section;
+    btn.classList.toggle("active", btn.dataset.view === "ranking" && sectionMatch);
+  });
   const candidatePool = getStep2CandidatePool();
   const calculated = candidatePool.map(calculateStep2).sort((a,b) => b.priority-a.priority);
   const selected = calculated.find(item => item.id === selectedStep2Id) || calculated[0];
   const uniqueAssets = new Set(candidatePool.map(item => item.asset)).size;
-  root.innerHTML = `<div class="view-heading step2-heading"><div><p class="eyebrow">STEP 2 · Selection Engine</p><h2>都可能做，但有限资源应该先投谁？</h2><p>只接收 STEP 1 通过项，以“资产 × 适应症 × 开发方案”为计算单位。Formation 成功案例只用于提炼逻辑与回测，不直接作为候选资产的评分或排名。</p></div><div class="step2-controls"><label><span>资源情景</span><select id="step2-profile" class="select-box">${Object.entries(step2Profiles).map(([key,item])=>`<option value="${key}" ${key===step2ResourceProfile?"selected":""}>${item.label}</option>`).join("")}</select></label><div class="metric-tabs">${Object.entries(step2LensLabels).map(([key,label])=>`<button data-step2-lens="${key}" class="metric-tab ${key===step2Lens?"active":""}">${label}</button>`).join("")}</div></div></div><div class="step2-principle"><b>不做九维简单加总</b><span>Gate / Hard Constraint → 核心价值模型 → 战略修正 → 置信度与稳健性独立展示</span><em>Formation 案例 = 回测锚点，不是官方算法</em></div><div class="summary-strip step2-summary"><div class="panel summary-card" style="--card-color:var(--teal)"><span>候选开发情景</span><strong>${calculated.length}</strong><small>来自 ${uniqueAssets} 个通过海选资产</small></div><div class="panel summary-card" style="--card-color:var(--blue)"><span>Tier 1</span><strong>${calculated.filter(item=>item.tier==="Tier 1").length}</strong><small>当前资源情景</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>逻辑覆盖</span><strong>73 / 73</strong><small>九个一级维度</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>低置信候选</span><strong>${calculated.filter(item=>item.confidence<55).length}</strong><small>优先补充决定性证据</small></div></div><div class="step2-layout"><section class="panel"><div class="panel-head"><div><h2>${step2LensLabels[step2Lens]}排序</h2><p>${step2Profiles[step2ResourceProfile].note}；置信度不被隐藏进总分。</p></div><span class="draft-badge">案例化演示 · 非真实数据</span></div>${renderStep2RankingTable(calculated)}</section>${renderStep2Detail(selected)}</div>${renderLogicDictionary()}`;
+  const heading = `<div class="view-heading step2-heading"><div><p class="eyebrow">STEP 2 · Predict + Decide</p><h2>先判断会不会成功，再判断值不值得优先投入</h2><p>科学与临床预测不被市场价值污染；STEP 3 产生的开发方案会重新进入 2A 预测，再由 2B 对“资产 × 开发方案”排序。</p></div><span class="draft-badge">结构化演示 · 非真实投资建议</span></div>${step2SectionTabs()}`;
+  if (step2Section === "prediction") {
+    root.innerHTML = `${heading}${renderPredictionPanel(selected)}${renderLogicDictionary()}`;
+    wireStep2Shared();
+    return;
+  }
+  root.innerHTML = `${heading}<div class="step2-controls"><label><span>资源情景</span><select id="step2-profile" class="select-box">${Object.entries(step2Profiles).map(([key,item])=>`<option value="${key}" ${key===step2ResourceProfile?"selected":""}>${item.label}</option>`).join("")}</select></label><div class="metric-tabs">${Object.entries(step2LensLabels).map(([key,label])=>`<button data-step2-lens="${key}" class="metric-tab ${key===step2Lens?"active":""}">${label}</button>`).join("")}</div></div><div class="step2-principle"><b>不做九维简单加总</b><span>Gate → PoS / Value / Time / Cost → 战略修正 → 资源配置</span><em>置信度与不确定性独立展示</em></div><div class="summary-strip step2-summary"><div class="panel summary-card" style="--card-color:var(--teal)"><span>候选开发情景</span><strong>${calculated.length}</strong><small>来自 ${uniqueAssets} 个通过海选资产</small></div><div class="panel summary-card" style="--card-color:var(--blue)"><span>Tier 1</span><strong>${calculated.filter(item=>item.tier==="Tier 1").length}</strong><small>当前资源情景</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>逻辑覆盖</span><strong>73 / 73</strong><small>九个一级维度</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>低置信候选</span><strong>${calculated.filter(item=>item.confidence<55).length}</strong><small>优先补决定性证据</small></div></div><div class="step2-layout"><section class="panel"><div class="panel-head"><div><h2>${step2LensLabels[step2Lens]}排序</h2><p>${step2Profiles[step2ResourceProfile].note}；STEP 3 优化方案可回写并参与同表比较。</p></div><span class="draft-badge">案例化演示 · 非真实数据</span></div>${renderStep2RankingTable(calculated)}</section>${renderStep2Detail(selected)}</div>${renderLogicDictionary()}`;
+  wireStep2Shared();
   document.querySelector("#step2-profile").addEventListener("change", event => { step2ResourceProfile = event.target.value; renderRanking(); });
   document.querySelectorAll("[data-step2-lens]").forEach(button => button.addEventListener("click", () => { step2Lens = button.dataset.step2Lens; renderRanking(); }));
-  document.querySelectorAll("[data-step2-candidate]").forEach(row => {
-    const select = () => { selectedStep2Id = row.dataset.step2Candidate; renderRanking(); };
-    row.addEventListener("click", select); row.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") select(); });
-  });
-  document.querySelectorAll("[data-step2-dimension]").forEach(button => button.addEventListener("click", () => { selectedDimensionId = button.dataset.step2Dimension; renderRanking(); }));
-  document.querySelectorAll("[data-open-step3]").forEach(button => button.addEventListener("click", () => {
-    step3SelectedCandidateId = button.dataset.openStep3;
-    step3Depth = "quick";
-    resetStep3Params();
-    switchView("scenario");
-  }));
+  document.querySelectorAll("[data-step2-candidate]").forEach(row => { const select = () => { selectedStep2Id = row.dataset.step2Candidate; renderRanking(); }; row.addEventListener("click", select); row.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") select(); }); });
+  document.querySelectorAll("[data-open-step3]").forEach(button => button.addEventListener("click", () => { step3SelectedCandidateId = button.dataset.openStep3; step3Depth = "quick"; resetStep3Params(); switchView("scenario"); }));
 }
 
 const step3Modules = [
@@ -712,7 +950,9 @@ const step3FailureMaps = {
   Gusacitinib:{ biology:12,molecule:15,pk:24,targetEngagement:22,dose:52,patient:70,endpoint:62,heterogeneity:58,trial:48,operational:25 },
   BLKR201:{ biology:22,molecule:16,pk:34,targetEngagement:48,dose:45,patient:56,endpoint:42,heterogeneity:54,trial:35,operational:20 },
   Sprifermin:{ biology:18,molecule:12,pk:15,targetEngagement:20,dose:32,patient:58,endpoint:78,heterogeneity:66,trial:64,operational:28 },
-  "anti-CD226":{ biology:34,molecule:20,pk:38,targetEngagement:55,dose:48,patient:62,endpoint:44,heterogeneity:60,trial:36,operational:22 }
+  "anti-CD226":{ biology:34,molecule:20,pk:38,targetEngagement:55,dose:48,patient:62,endpoint:44,heterogeneity:60,trial:36,operational:22 },
+  HBM4003:{ biology:18,molecule:14,pk:20,targetEngagement:24,dose:40,patient:78,endpoint:46,heterogeneity:72,trial:65,operational:28 },
+  HBM1020:{ biology:42,molecule:18,pk:28,targetEngagement:62,dose:36,patient:82,endpoint:48,heterogeneity:76,trial:58,operational:24 }
 };
 
 const step3ScenarioDefinitions = [
@@ -796,7 +1036,7 @@ function step3ScenarioCard(scenario, baseline, tags) {
 function renderStep3ModuleCoverage() {
   const module = step3Modules.find(item => item.id === selectedStep3ModuleId) || step3Modules[0];
   const total = step3Modules.reduce((sum,item)=>sum+item.dimensions.length,0);
-  return `<section class="step3-modules"><div class="logic-heading"><div><p class="eyebrow">STEP 3 计算维度</p><h2>9 个重构模块，${total} 个二级维度</h2><p>模块不是直接相加，而是改变 Scenario 参数并重新计算 PoS、价值、时间、成本、商业寿命和不确定性。</p></div><div class="step3-loop"><b>STEP 2A 基础排序</b><span>快速重构</span><b>STEP 2B 动态重排</b><span>深度优化</span><b>最终决策</b></div></div><div class="dimension-grid step3-module-grid">${step3Modules.map(item=>`<button data-step3-module="${item.id}" class="dimension-card ${item.id===selectedStep3ModuleId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.dimensions.length} 个维度</small></button>`).join("")}</div><div class="panel step3-module-detail"><div><p class="eyebrow">模块 ${module.number}</p><h2>${module.name}</h2><p>${module.question}</p></div><div class="module-method"><span>${module.method}</span><code>${module.formula}</code></div><div class="module-dimensions">${module.dimensions.map(name=>`<span>${name}</span>`).join("")}</div></div></section>`;
+  return disclosure("查看全部项目调整逻辑", `9个重构模块、${total}个二级维度；默认只展示当前推荐方案。`, `<section class="step3-modules"><div class="logic-heading"><div><p class="eyebrow">STEP 3 计算维度</p><h2>9 个重构模块，${total} 个二级维度</h2><p>模块不是直接相加，而是改变 Scenario 参数并重新计算 PoS、价值、时间、成本、商业寿命和不确定性。</p></div><div class="step3-loop"><b>STEP 2A 基础排序</b><span>快速重构</span><b>STEP 2B 动态重排</b><span>深度优化</span><b>最终决策</b></div></div><div class="dimension-grid step3-module-grid">${step3Modules.map(item=>`<button data-step3-module="${item.id}" class="dimension-card ${item.id===selectedStep3ModuleId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.dimensions.length} 个维度</small></button>`).join("")}</div><div class="panel step3-module-detail"><div><p class="eyebrow">模块 ${module.number}</p><h2>${module.name}</h2><p>${module.question}</p></div><div class="module-method"><span>${module.method}</span><code>${module.formula}</code></div><div class="module-dimensions">${module.dimensions.map(name=>`<span>${name}</span>`).join("")}</div></div></section>`);
 }
 
 function nextBestExperiment(candidate, scenario) {
@@ -820,6 +1060,9 @@ function renderScenario() {
   const paretoCount = scenarios.filter(item=>item.pareto).length;
   const disabled = step3ControlMode === "auto" ? "disabled" : "";
   root.innerHTML = `<div class="view-heading step3-heading"><div><p class="eyebrow">STEP 3 · Scenario Generator</p><h2>假设场景生成与开发方案优化</h2><p>先分解历史问题，再生成有依据的假设场景。每个场景重新计算核心变量，通过 Pareto 比较后回写 STEP 2；当前为演示输入和拟议公式。</p></div><div class="step3-top-controls"><label><span>分析对象</span><select id="step3-candidate" class="select-box">${step2Candidates.map(item=>`<option value="${item.id}" ${item.id===candidate.id?"selected":""}>${item.asset} · ${item.plan}</option>`).join("")}</select></label><div class="mode-switch"><button data-step3-depth="quick" class="${step3Depth==="quick"?"active":""}">快速重构</button><button data-step3-depth="deep" class="${step3Depth==="deep"?"active":""}">深度优化</button></div><div class="mode-switch"><button data-step3-mode="auto" class="${step3ControlMode==="auto"?"active":""}">系统生成</button><button data-step3-mode="expert" class="${step3ControlMode==="expert"?"active":""}">人工假设</button></div></div></div>${Object.keys(step3Writebacks).length?`<div class="writeback-notice"><b>${Object.keys(step3Writebacks).length} 个优化方案已加入 STEP 2 动态排序</b><button data-view-step2>查看重新排序</button></div>`:""}<div class="step3-principle"><span><b>基准方案保留</b>所有变化均显示相对差值</span><span><b>约束先行</b>生物学、毒性、DDI、监管与 CMC Gate</span><span><b>多目标输出</b>不把 PoS、价值、时间和成本压成黑箱单分</span><span><b>假设可证伪</b>每个场景都有前提、停止规则与下一项实验</span></div><div class="step3-workspace"><aside class="panel step3-control-panel"><div class="candidate-context"><p class="eyebrow">STEP 2 输入</p><h2>${candidate.asset}</h2><p>${candidate.indication} · ${candidate.plan}</p><div><span>PoS <b>${candidate.pos}%</b></span><span>价值 <b>${candidate.futureValue}</b></span><span>时间 <b>${candidate.timeMonths}月</b></span><span>成本 <b>${candidate.cost}M</b></span></div></div><div class="failure-map"><h3>历史失败原因概率图 <em>演示</em></h3>${Object.entries(step3FailureLabels).map(([key,label])=>`<div><label><span>${label}</span><b>${failureMap[key]}%</b></label><i><span style="width:${failureMap[key]}%"></span></i></div>`).join("")}</div><div class="step3-parameters"><h3>${step3ControlMode==="auto"?"系统推断参数":"人工情景参数"}</h3>${[["evidence","证据强度"],["enrichment","患者富集可行性"],["execution","执行效率"],["riskTolerance","风险容忍度"]].map(([key,label])=>`<div class="control-group"><label class="control-label" for="step3-${key}"><span>${label}</span><output id="step3-${key}-output">${step3Params[key]}</output></label><input id="step3-${key}" data-step3-param="${key}" type="range" min="20" max="95" value="${step3Params[key]}" ${disabled}/></div>`).join("")}</div></aside><section class="step3-scenario-area"><div class="summary-strip step3-summary"><div class="panel summary-card" style="--card-color:var(--blue)"><span>生成场景</span><strong>${scenarios.length}</strong><small>${step3Depth==="quick"?"轻量预判":"完整搜索"}</small></div><div class="panel summary-card" style="--card-color:var(--teal)"><span>Pareto 方案</span><strong>${paretoCount}</strong><small>非支配解</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>最高信息增益</span><strong>${Math.max(...scenarios.map(item=>item.informationGain))}</strong><small>下一步去风险</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>关键未知项</span><strong>${candidate.missing}</strong><small>来自 STEP 2</small></div></div><div class="scenario-option-grid">${scenarios.map(item=>step3ScenarioCard(item,baseline,tags)).join("")}</div><div class="panel scenario-inspector"><div class="scenario-inspector-head"><div><p class="eyebrow">当前假设场景</p><h2>${selected.name}</h2><p>${selected.variables.join(" · ")}</p></div><div>${selected.pareto?'<span class="pareto-badge">Pareto 最优集</span>':''}${(tags[selected.id]||[]).map(tag=>`<span class="objective-badge">${tag}</span>`).join("")}</div></div><div class="scenario-inspector-grid"><div><span>核心假设</span><p>${selected.assumption}</p></div><div><span>停止规则</span><p>${selected.stop}</p></div><div><span>风险调整价值</span><strong>${selected.riskAdjustedValue}</strong><small>演示指数</small></div><div><span>资本效率</span><strong>${selected.capitalEfficiency}</strong><small>演示指数</small></div><div><span>商业寿命</span><strong>${selected.commercialLife} 年</strong><small>重算结果</small></div><div><span>置信度</span><strong>${selected.confidence}%</strong><small>独立展示</small></div></div>${selected.isBaseline?'<div class="baseline-note">这是比较基准，不作为优化方案回写。</div>':`<button id="step3-writeback" class="writeback-button" ${alreadyWritten?"disabled":""}>${alreadyWritten?"已作为新情景回写 STEP 2":"将此优化方案加入 STEP 2 重新排序"}</button>`}</div><div class="panel next-experiment"><div><p class="eyebrow">Next Best Experiment</p><h2>${experiment.title}</h2><p>${experiment.answer}</p></div><div><span>预计周期 <b>${experiment.time}</b></span><span>决策影响 <b>${experiment.impact}</b></span><span>停止规则 <b>${experiment.stop}</b></span></div></div></section></div><section class="panel scenario-comparison"><div class="panel-head"><div><h2>场景重新计算对比</h2><p>同一资产的基准方案与假设方案并列比较；所有数值均为演示输入。</p></div><span class="draft-badge">非真实研发结论</span></div><div class="table-wrap"><table><thead><tr><th>场景</th><th>PoS</th><th>未来价值</th><th>时间</th><th>成本</th><th>商业寿命</th><th>资本效率</th><th>置信度</th><th>状态</th></tr></thead><tbody>${scenarios.map(item=>`<tr class="${item.id===selected.id?"selected":""}"><td><strong>${item.name}</strong><small>${item.variables.join(" / ")}</small></td><td>${item.pos}%</td><td>${item.futureValue}</td><td>${item.timeMonths}月</td><td>${item.cost}M</td><td>${item.commercialLife}年</td><td>${item.capitalEfficiency}</td><td>${item.confidence}%</td><td>${item.pareto?"Pareto":"被支配"}</td></tr>`).join("")}</tbody></table></div></section>${renderStep3ModuleCoverage()}`;
+  root.insertAdjacentHTML("beforeend", `<section class="pareto-scope"><article class="panel active"><p class="eyebrow">Development Pareto · 当前已实现</p><h2>同一资产的开发方案比较</h2><p>比较 PoS、价值、时间和成本，寻找非支配开发路径。</p><div><span>Scenario A</span><span>Scenario B</span><span>Scenario C</span></div></article><article class="panel"><p class="eyebrow">Competitive Pareto · 下一层</p><h2>本资产与竞品的产品画像比较</h2><p>比较疗效、安全、便利性、患者人群和差异化，判断是否真正推动竞争前沿。</p><div><span>Drug A</span><span>Drug B</span><span>Future SOC</span></div></article></section>`);
+  wrapElementInDisclosure(document.querySelector(".scenario-comparison"), "查看所有场景的完整计算对比", "PoS、价值、时间、成本、商业寿命、资本效率与置信度并列比较。", false);
+  wrapElementInDisclosure(document.querySelector(".pareto-scope"), "查看Pareto分析范围", "区分同一资产的开发方案比较与未来的竞品画像比较。", false);
   wireStep3(candidate, scenarios, selected, writebackId);
 }
 
@@ -837,7 +1080,7 @@ function wireStep3(candidate, scenarios, selected, writebackId) {
   const writeback = document.querySelector("#step3-writeback");
   if (writeback) writeback.addEventListener("click",()=>{
     step3Writebacks[writebackId] = {
-      id:writebackId, parentId:candidate.id, name:`${selected.name}（STEP 3 优化）`, version:"v0.7-demo",
+      id:writebackId, parentId:candidate.id, name:`${selected.name}（STEP 3 优化）`, version:"v0.9-demo",
       values:{ pos:selected.pos, futureValue:selected.futureValue, timeMonths:selected.timeMonths, cost:selected.cost, commercialLife:selected.commercialLife, confidence:selected.confidence, missing:Math.max(1,candidate.missing-2), drivers:[`STEP 3 场景：${selected.name}`,`重算 PoS / 时间 / 成本 / 商业寿命`,`通过 ${selected.variables.join("、")} 形成新开发假设`], unknown:selected.stop }
     };
     selectedStep2Id = writebackId;
@@ -845,12 +1088,34 @@ function wireStep3(candidate, scenarios, selected, writebackId) {
   });
 }
 
+const predictionHistory = [
+  { asset:"HBM4003", version:"PRED-2026-1005-PILOT-01", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.9-pilot", pos:52, interval:"45–60%", recommendation:"优先验证无肝转移MSS mCRC富集策略", evidence:7, unknown:"小样本非随机结果能否前瞻性重复", immutable:true },
+  { asset:"HBM1020", version:"PRED-2026-1005-PILOT-01", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.9-pilot", pos:38, interval:"30–45%", recommendation:"先做HHLA2表达分层的富集扩展", evidence:5, unknown:"疾病稳定能否转化为客观缓解", immutable:true },
+  { asset:"Gusacitinib", version:"PRED-2026-0618-V1", date:"2026-06-18", cutoff:"2026-06-15", model:"v0.5-demo", pos:39, interval:"25–54%", recommendation:"补充患者分层证据", evidence:41, unknown:"预测性 biomarker 尚未定义", immutable:true },
+  { asset:"Gusacitinib", version:"PRED-2026-0827-V2", date:"2026-08-27", cutoff:"2026-08-25", model:"v0.6-demo", pos:43, interval:"30–57%", recommendation:"进入聚焦尽调", evidence:53, unknown:"剂量与患者亚组的交互", immutable:true },
+  { asset:"Gusacitinib", version:"PRED-2026-1005-V3", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.8-demo", pos:46, interval:"34–58%", recommendation:"比较富集 PoC 场景", evidence:68, unknown:"最佳 biomarker 与长期安全窗", immutable:true },
+  { asset:"BLKR201", version:"PRED-2026-1005-V1", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.8-demo", pos:38, interval:"22–54%", recommendation:"先验证人体靶点结合", evidence:49, unknown:"人体 Target Engagement", immutable:true },
+  { asset:"Sprifermin", version:"PRED-2026-1005-V1", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.8-demo", pos:43, interval:"31–55%", recommendation:"验证结构终点与症状获益连接", evidence:61, unknown:"结构改善的临床可感知性", immutable:true }
+];
+
+function renderRegistry() {
+  const assetNames = [...new Set(predictionHistory.map(item=>item.asset))];
+  const records = predictionHistory.filter(item=>item.asset===registryAsset);
+  const latest = records[records.length-1];
+  root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">Prediction Registry</p><h2>旧预测不被新证据覆盖</h2><p>每次判断保留证据截止时间、模型版本、概率区间、关键未知项和建议。当前为登记结构演示；正式版将使用不可变记录。</p></div><span class="draft-badge">时间完整性 · 演示记录</span></div><div class="registry-toolbar">${assetNames.map(name=>`<button data-registry-asset="${name}" class="${registryAsset===name?"active":""}">${name}</button>`).join("")}</div><section class="panel registry-hero"><div><span>当前资产</span><h2>${registryAsset}</h2><p>${records.length} 个历史预测版本 · 最新证据截止 ${latest.cutoff}</p></div><div><span>最新 PoS</span><strong>${latest.pos}%</strong><small>80% 区间 ${latest.interval}</small></div><div><span>当前建议</span><strong>${latest.recommendation}</strong><small>${latest.unknown}</small></div></section><section class="registry-timeline">${records.map((item,index)=>`<article class="panel"><div class="registry-node"><span>${index+1}</span><i></i></div><div class="registry-version"><small>${item.date}</small><h3>${item.version}</h3><p>证据截止 ${item.cutoff} · ${item.model}</p></div><div class="registry-pos"><span>PoS</span><strong>${item.pos}%</strong><small>${item.interval}</small></div><div class="registry-change"><span>关键未知项</span><p>${item.unknown}</p><small>${item.evidence} 条结构化证据</small></div><div class="registry-recommendation"><span>当时建议</span><strong>${item.recommendation}</strong><small>${item.immutable?"已锁定 · 不覆盖":"草稿"}</small></div></article>`).join("")}</section><section class="panel registry-calibration"><div><p class="eyebrow">Prospective Validation</p><h2>未来真实结果如何验证预测</h2></div><div><span>01</span><p>预测前锁定证据快照与版本</p></div><div><span>02</span><p>新证据只生成新版本</p></div><div><span>03</span><p>临床读出后比较预测与现实</p></div><div><span>04</span><p>分析哪些先验、变量和信号有效</p></div><em>真实结果尚未接入</em></section>`;
+  wrapElementInDisclosure(document.querySelector(".registry-timeline"), "查看全部历史预测版本", "旧预测不会被新证据覆盖，用于未来回测模型偏差。", false);
+  document.querySelectorAll("[data-registry-asset]").forEach(button=>button.addEventListener("click",()=>{registryAsset=button.dataset.registryAsset;renderRegistry();}));
+}
+
 function renderEvidence() {
   const filtered = evidenceFilter === "ALL" ? evidence : evidence.filter(e => e.tag === evidenceFilter);
   root.innerHTML = `<div class="view-heading"><div><h2>让每一个判断都能回到来源、时间与模型版本</h2><p>事实、案例反推、外部一级来源和扩展逻辑必须分开；低等级来源只能触发研究，不能单独形成淘汰结论。</p></div></div>
+    <section class="evidence-lineage panel"><div class="evidence-lineage-head"><div><p class="eyebrow">Evidence Lineage</p><h2>证据怎样进入最终结论</h2></div><span>每一层都保留来源与转换规则</span></div><div class="lineage-flow"><article><span>01</span><b>Raw Evidence</b><small>论文、试验、监管、公司、遗传学</small></article><i></i><article><span>02</span><b>Claim</b><small>抽取可验证的事实主张</small></article><i></i><article><span>03</span><b>Factor</b><small>映射到 Biology、PK、Safety 等变量</small></article><i></i><article><span>04</span><b>Probability</b><small>按阶段和证据质量进入概率模型</small></article><i></i><article><span>05</span><b>Decision</b><small>形成 Gate、排序、情景与下一项实验</small></article></div><div class="lineage-example"><b>示例</b><span>人体遗传学研究</span><em>→</em><span>靶点—疾病因果支持</span><em>→</em><span>Target Validation</span><em>→</em><span>机制节点概率</span><em>→</em><span>PoS 区间</span></div></section>
     <div class="source-policy-grid">${sourcePolicy.map(item => `<article class="panel source-policy-card"><span>${item.tier}</span><div><h3>${item.title}</h3><p>${item.sources}</p><small>${item.use}</small></div></article>`).join("")}</div>
     <div class="evidence-layout"><aside class="panel evidence-filter"><p class="eyebrow">证据标签</p><h2>证据类型</h2>${[["ALL","全部"],["F","[F] Formation 直接公开"],["C","[C] 案例反推"],["P","[P] 外部一级来源"],["E","[E] 扩展逻辑"]].map(([k,v]) => `<button data-filter="${k}" class="${evidenceFilter===k?"active":""}"><span>${v}</span><b>${k==="ALL"?evidence.length:evidence.filter(e=>e.tag===k).length}</b></button>`).join("")}</aside>
       <section class="panel table-wrap"><table class="evidence-table"><thead><tr><th>类型</th><th>对象 / Claim</th><th>来源</th><th>质量</th><th>更新</th></tr></thead><tbody>${filtered.map(e => `<tr><td><span class="source-tag source-${e.tag.toLowerCase()}">[${e.tag}]</span></td><td><strong>${e.asset}</strong><br><span class="audit-note">${e.claim}</span></td><td>${e.source}</td><td>${e.quality}</td><td>${e.updated}</td></tr>`).join("")}</tbody></table></section></div>`;
+  wrapElementInDisclosure(document.querySelector(".source-policy-grid"), "查看证据等级规则", "哪些来源可以形成结论，哪些只能触发进一步研究。", false);
+  wrapElementInDisclosure(document.querySelector(".evidence-layout"), "查看全部证据记录", "按事实、案例反推、外部来源与扩展逻辑筛选。", false);
   document.querySelectorAll("[data-filter]").forEach(btn => btn.addEventListener("click", () => { evidenceFilter = btn.dataset.filter; renderEvidence(); }));
 }
 
@@ -858,12 +1123,18 @@ function switchView(view) {
   currentView = view;
   pageTitle.textContent = viewTitles[view];
   document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
-  document.querySelectorAll(".pipeline-step").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
-  ({ workspace: renderWorkspace, recoverability: renderRecoverability, ranking: renderRanking, scenario: renderScenario, evidence: renderEvidence })[view]();
+  document.querySelectorAll(".pipeline-step").forEach(btn => {
+    const sectionMatch = !btn.dataset.step2SectionTarget || btn.dataset.step2SectionTarget === step2Section;
+    btn.classList.toggle("active", btn.dataset.view === view && sectionMatch);
+  });
+  ({ workspace: renderWorkspace, cases: renderCaseStudies, radar: renderRadar, recoverability: renderRecoverability, ranking: renderRanking, scenario: renderScenario, registry: renderRegistry, evidence: renderEvidence })[view]();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => {
+  if (btn.dataset.step2SectionTarget) step2Section = btn.dataset.step2SectionTarget;
+  switchView(btn.dataset.view);
+}));
 document.querySelector("#method-button").addEventListener("click", () => methodDialog.showModal());
 methodDialog.addEventListener("click", event => { if (event.target === methodDialog) methodDialog.close(); });
 
