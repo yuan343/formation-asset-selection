@@ -273,6 +273,7 @@ let registryAsset = "HBM4003";
 const root = document.querySelector("#view-root");
 const pageTitle = document.querySelector("#page-title");
 const methodDialog = document.querySelector("#method-dialog");
+const pipeline = document.querySelector(".pipeline");
 
 const statusLabel = (asset) => `<span class="status-pill status-${asset.statusClass}">${asset.status}</span>`;
 const confidence = (asset) => `<span class="confidence"><span class="confidence-bar"><i style="width:${asset.confidence}%"></i></span>${asset.confidence}%</span>`;
@@ -1122,6 +1123,7 @@ function renderEvidence() {
 function switchView(view) {
   currentView = view;
   pageTitle.textContent = viewTitles[view];
+  pipeline.classList.toggle("pipeline-hidden", !["workspace", "radar"].includes(view));
   document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
   document.querySelectorAll(".pipeline-step").forEach(btn => {
     const sectionMatch = !btn.dataset.step2SectionTarget || btn.dataset.step2SectionTarget === step2Section;
