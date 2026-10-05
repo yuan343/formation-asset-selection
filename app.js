@@ -43,6 +43,155 @@ const assets = [
   }
 ];
 
+const historicalCases = [
+  {
+    id: "FITUSIRAN",
+    candidateId: "FITUSIRAN-ATDR",
+    asset: "Fitusiran / Qfitlia",
+    target: "Antithrombin (AT)",
+    modality: "siRNA",
+    stage: "Phase 3历史回测",
+    rights: "由Alnylam发现，Sanofi负责后续开发与商业化",
+    currentUse: "血友病A或B（伴或不伴凝血因子抑制物）的常规预防治疗",
+    question: "出现严重血栓风险后，问题来自机制本身，还是固定剂量与风险管理方式？",
+    verdict: "可通过剂量与风险管理挽救",
+    verdictClass: "recoverable",
+    recommendation: "停止固定高暴露方案，按AT活性动态调剂量，并把突破性出血处置纳入统一风险管理",
+    probability: "55–70%",
+    probabilityLabel: "重构方案恢复可开发性并进入注册路径",
+    confidence: 74,
+    evidenceCutoff: "2020-10-30（历史回测）",
+    step1Summary: "潜在可救：疗效与靶点调控仍有支持，但原固定剂量方案触发安全性硬风险，必须先重构暴露和监测。",
+    backtest: {
+      task: "只使用第二次暂停前已公开的信息，判断项目应停止还是重构。",
+      outcomeDate: "2025-03-28",
+      outcome: "FDA批准Qfitlia；获批方案改为AT活性指导的个体化剂量，而非原固定80 mg月给药。"
+    },
+    knownFacts: [
+      "项目已显示降低出血事件的临床活性，靶点调控与药效方向并未消失。",
+      "固定剂量开发期间出现包括死亡在内的严重血栓事件，临床给药曾被暂停。",
+      "风险与AT过度降低、伴随止血药使用及剂量管理存在可干预联系。",
+      "监管与公司随后接受以AT活性为依据的个体化剂量方案继续开发。"
+    ],
+    risks: [
+      "安全风险具有机制相关性，不能仅靠扩大样本量解决。",
+      "真实世界监测、剂量调整和突破性出血处置会增加使用复杂度。",
+      "如果安全窗过窄，商业便利性可能被风险管理负担抵消。"
+    ],
+    adjustments: [
+      { lever: "剂量", action: "从固定剂量改为以AT活性15–35%为目标的动态剂量。", impact: "+10–18pp", reason: "直接控制与血栓风险相关的药效强度。" },
+      { lever: "给药周期", action: "降低起始暴露并拉长给药间隔，再根据AT活性调整。", impact: "+5–10pp", reason: "减少过度AT抑制并保留预防出血获益。" },
+      { lever: "风险管理", action: "统一突破性出血治疗规则、监测窗口与暂停标准。", impact: "降低尾部风险", reason: "严重事件不仅由分子决定，也与伴随处理和暴露管理相关。" },
+      { lever: "人群与教育", action: "明确高风险患者条件并强化处方者与患者教育。", impact: "提高可执行性", reason: "个体化方案只有在监测和执行可靠时才成立。" }
+    ],
+    nextExperiment: "在AT活性指导剂量下前瞻性验证出血控制与血栓风险的净临床获益",
+    stopRule: "若目标AT窗口内仍出现不可接受的严重血栓，或风险管理无法稳定执行，则停止该开发方案。",
+    sources: [
+      { title: "FDA · Qfitlia批准公告", url: "https://www.fda.gov/news-events/press-announcements/fda-approves-novel-treatment-hemophilia-or-b-or-without-factor-inhibitors", tier: "监管结果" },
+      { title: "FDA · Qfitlia Drug Trials Snapshot", url: "https://www.fda.gov/drugs/drug-trials-snapshots/drug-trials-snapshots-qfitlia", tier: "监管审评" },
+      { title: "Alnylam · 临床暂停与致死性血栓事件", url: "https://investors.alnylam.com/press-release?id=21846", tier: "公司历史披露" },
+      { title: "Sanofi · 修订剂量与风险管理方案", url: "https://www.sanofi.com/en/media-room/press-releases/2021/2021-02-05-16-30-00-2170841", tier: "公司方案披露" }
+    ]
+  },
+  {
+    id: "ETRIPAMIL",
+    candidateId: "ETRIPAMIL-RAPID",
+    asset: "Etripamil / Cardamyst",
+    target: "L-type calcium channel",
+    modality: "鼻喷小分子",
+    stage: "Phase 3历史回测",
+    rights: "由Milestone Pharmaceuticals开发",
+    currentUse: "成人阵发性室上性心动过速（PSVT）的自我给药急性治疗",
+    question: "首个Ⅲ期主要终点未达标，代表药物无效，还是终点窗口和给药方案没有对齐药理作用？",
+    verdict: "试验设计可救，分子不应直接判死",
+    verdictClass: "recoverable",
+    recommendation: "把主要终点收窄到快速转复窗口，允许必要时重复给药，并保留院外自我用药场景",
+    probability: "55–70%",
+    probabilityLabel: "重构关键试验后确认临床获益并支持申报",
+    confidence: 70,
+    evidenceCutoff: "2020-03-23（历史回测）",
+    step1Summary: "值得重构：五小时主要终点失败，但45分钟早期转复信号与快速起效药理一致，优先怀疑终点与给药设计。",
+    backtest: {
+      task: "在NODE-301首个Ⅲ期失败时，判断应停止开发还是重做关键试验。",
+      outcomeDate: "2025-12-12",
+      outcome: "FDA批准Cardamyst；后续RAPID研究采用30分钟主要终点并允许重复给药，验证了重构方向。"
+    },
+    knownFacts: [
+      "NODE-301以五小时内转复为主要分析窗口，主要终点未达统计学显著性。",
+      "45分钟的早期转复分析达到统计学显著，方向与快速起效的鼻喷药理一致。",
+      "安全性未显示足以直接否定分子的不可逆问题。",
+      "FDA随后同意把RAPID研究主要终点调整为30分钟内转复，并允许10分钟后第二剂。"
+    ],
+    risks: [
+      "早期阳性可能来自事后切片，必须用预设终点前瞻性复制。",
+      "自我给药依赖正确识别发作、操作和必要时追加剂量。",
+      "短时间获益必须转化为患者可感知、可监管接受的临床价值。"
+    ],
+    adjustments: [
+      { lever: "主要终点", action: "把主要评估窗口从五小时改为30分钟内转复。", impact: "+10–16pp", reason: "让终点与药物快速起效、短作用时间相匹配。" },
+      { lever: "给药方案", action: "在症状持续时允许10分钟后第二次鼻喷。", impact: "+4–8pp", reason: "处理首次给药不足和个体暴露差异。" },
+      { lever: "使用场景", action: "继续聚焦院外自我用药，记录症状缓解与医疗资源使用。", impact: "提高产品价值", reason: "差异化来自快速、便携和减少急诊依赖。" },
+      { lever: "试验设计", action: "把早期信号写入预设统计方案并独立重复。", impact: "提高置信度", reason: "避免把事后分析误当成确定性证据。" }
+    ],
+    nextExperiment: "开展以30分钟转复为预设主要终点、允许重复给药的独立关键Ⅲ期试验",
+    stopRule: "若预设早期窗口仍未改善转复，或自我给药安全性不成立，则停止当前产品路径。",
+    sources: [
+      { title: "NODE-301首个Ⅲ期结果", url: "https://www.sec.gov/Archives/edgar/data/1408443/000110465920037367/tm2013489d1_ex99-1.htm", tier: "公司法定披露" },
+      { title: "FDA反馈与RAPID方案重构", url: "https://www.sec.gov/Archives/edgar/data/1408443/000110465920085814/tm2025424d1_ex99-1.htm", tier: "公司法定披露" },
+      { title: "Milestone · RAPID阳性结果", url: "https://investors.milestonepharma.com/news-releases/news-release-details/milestone-pharmaceuticals-announces-positive-results-phase-3", tier: "公司临床结果" },
+      { title: "FDA · Cardamyst批准公告", url: "https://www.fda.gov/drugs/news-events-human-drugs/fda-approves-drug-type-abnormally-fast-heart-rhythm", tier: "监管结果" }
+    ]
+  },
+  {
+    id: "VERUBECestat",
+    candidateId: "VERUBEC-STOP",
+    asset: "Verubecestat",
+    target: "BACE1",
+    modality: "口服小分子抑制剂",
+    stage: "Phase 3已终止",
+    rights: "由Merck开发",
+    currentUse: "曾研究用于轻中度及前驱期阿尔茨海默病，项目已终止",
+    question: "明确降低淀粉样蛋白却没有临床获益后，提前用药还能否挽救同一分子和机制？",
+    verdict: "低潜力 / 建议停止",
+    verdictClass: "dead",
+    recommendation: "不再资助同一分子的宽泛疗效试验；只有新证据能解释靶点调控与临床无效的断裂时才重新打开",
+    probability: "5–15%",
+    probabilityLabel: "同一分子通过前移人群恢复临床价值",
+    confidence: 86,
+    evidenceCutoff: "2018-02-13（历史回测）",
+    step1Summary: "低潜力并接近淘汰：已有充分靶点调控，却无临床获益并伴不良事件；不能把“更早患者”当作无限续命假设。",
+    backtest: {
+      task: "在轻中度AD试验因无效终止后，判断前移至前驱期是否值得继续。",
+      outcomeDate: "2019-04-11",
+      outcome: "前驱期APECS研究同样未显示临床获益，并出现部分认知恶化信号，支持停止判断。"
+    },
+    knownFacts: [
+      "EPOCHⅢ期纳入近两千名轻中度AD患者，并在中期分析后因无效提前终止。",
+      "药物显著降低脑脊液及影像相关淀粉样指标，说明暴露和靶点调控并非主要缺口。",
+      "认知和日常功能终点未获益，且部分不良事件更多。",
+      "机制链在‘生物标志物改变→患者临床获益’处发生关键断裂。"
+    ],
+    risks: [
+      "把患者前移并不能自动修复靶点调控与临床结局之间的因果断裂。",
+      "更早期试验持续时间更长、成本更高，错误继续的机会成本极大。",
+      "不良事件和潜在认知恶化使可接受安全窗进一步收窄。"
+    ],
+    adjustments: [
+      { lever: "停止规则", action: "把充分靶点调控但无临床获益设为强停止信号。", impact: "避免无效投入", reason: "这比单纯剂量或终点问题更接近机制层失败。" },
+      { lever: "反证要求", action: "仅当新的人体因果证据能解释阶段、时间窗或亚群差异时再评估。", impact: "提高重启门槛", reason: "重启必须解决旧证据，而不是绕开旧证据。" },
+      { lever: "下一实验", action: "优先做低成本机制反证，不直接再进入大型疗效试验。", impact: "提高VOI", reason: "用最小成本判断是否存在真正可区分的生物学场景。" },
+      { lever: "组合决策", action: "将资源转向机制链更完整、临床可测的候选资产。", impact: "释放资源", reason: "负向对照同样是资产组合优化的重要输出。" }
+    ],
+    nextExperiment: "如无新的强因果证据则不开展下一项临床试验；最多进行预设阈值的机制反证研究",
+    stopRule: "缺乏能够解释既往阴性结果的新人体证据时，维持停止状态。",
+    sources: [
+      { title: "NEJM · EPOCH轻中度ADⅢ期", url: "https://www.nejm.org/doi/full/10.1056/NEJMoa1706441", tier: "同行评议结果" },
+      { title: "NEJM · APECS前驱期ADⅢ期", url: "https://www.nejm.org/doi/full/10.1056/NEJMoa1812840", tier: "同行评议结果" },
+      { title: "ClinicalTrials.gov · NCT01739348", url: "https://clinicaltrials.gov/study/NCT01739348", tier: "试验登记" }
+    ]
+  }
+];
+
 const realCases = [
   {
     id: "HBM4003",
@@ -128,7 +277,8 @@ const realCases = [
       { title: "和铂2026路演材料", url: "https://www.harbourbiomed.com/upload/202604/1776889891598235035.pdf", tier: "公司投资者材料" },
       { title: "和铂当前肿瘤管线", url: "https://www.harbourbiomed.com/therapeutics/immunooncology", tier: "公司管线" }
     ]
-  }
+  },
+  ...historicalCases
 ];
 
 const evidence = [
@@ -136,6 +286,10 @@ const evidence = [
   { tag: "P", asset: "HBM4003", claim: "小样本、开放标签且非随机，现有结果只能支持确认性研究假设。", source: "试验设计审计", quality: "模型解释", updated: "2026-10" },
   { tag: "P", asset: "HBM1020", claim: "Ⅰ期公开数据中15名可评价患者有7名疾病稳定，两名肿瘤缩小11%和25%。", source: "和铂ESMO 2024 / NCT05824663", quality: "公开临床结果", updated: "2026-10" },
   { tag: "E", asset: "HBM1020", claim: "HHLA2高表达、PD-L1阴性或PD-1耐药人群富集属于待验证的开发假设。", source: "v0.9案例推演", quality: "研究性假设", updated: "2026-10" },
+  { tag: "P", asset: "Fitusiran", claim: "固定剂量方案发生严重血栓风险后，开发转向AT活性指导的个体化剂量；Qfitlia于2025年获FDA批准。", source: "FDA / Alnylam / Sanofi", quality: "监管与公司一级来源", updated: "2026-10" },
+  { tag: "P", asset: "Etripamil", claim: "NODE-301五小时主要终点失败，但早期转复信号促使RAPID改用30分钟主要终点并允许重复给药；Cardamyst于2025年获批。", source: "SEC披露 / FDA", quality: "法定披露与监管来源", updated: "2026-10" },
+  { tag: "P", asset: "Verubecestat", claim: "充分降低淀粉样相关指标未转化为认知或功能获益，轻中度与前驱期Ⅲ期研究均为阴性。", source: "NEJM / ClinicalTrials.gov", quality: "同行评议临床结果", updated: "2026-10" },
+  { tag: "E", asset: "历史回测规则", claim: "模型只允许读取预设证据截止日前的信息；后来真实结果仅用于检验当时判断，不回填初始预测。", source: "v0.9回测规范", quality: "模型规则", updated: "2026-10" },
   { tag: "F", asset: "Formation 运营模式", claim: "资产选择、开发策略与临床执行属于连续决策链。", source: "Formation 官网与公开材料", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "适应症全景分析", claim: "原始数据需标准化；同行评议文献通常优先于注册库中的结果摘要。", source: "Formation 工程博客", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "人类遗传学", claim: "遗传学分析进入每项资产评估，并保留人工检查点。", source: "Formation 遗传学工作流", quality: "一级来源", updated: "2026-10" },
@@ -381,7 +535,7 @@ function renderWorkspace() {
   const selected = assets.find(a => a.id === selectedAssetId) || assets[0];
   root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答五个问题</p><h2>把复杂的资产判断，变成一条可以顺着走完的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases" class="primary-button">查看真实案例试跑</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>方向验证期</strong><p>逻辑已成型，正在用少量真实案例校准规则、权重与建议质量。</p></aside></section>
     <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到提出行动建议</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>反馈闭环</b><span>STEP 3 形成的新开发方案会回到 STEP 2A / 2B，重新计算成功概率与资源优先级。</span></div></section>
-    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>先用两个和铂公开案例检查这套逻辑</h2><p>HBM4003用来校准“有数据时系统会不会判断”；HBM1020用来验证“信息不足时系统会不会保持谨慎”。</p></div><div class="case-entry-assets">${realCases.map(item=>`<button data-real-case-entry="${item.id}"><span>${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}</div><button data-overview-view="cases" class="primary-button">进入案例试跑</button></section>
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>用中国项目与海外历史回测检查这套逻辑</h2><p>两个和铂案例检验当前判断；三个海外案例分别检验安全性重构、试验设计重构和及时停止。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-real-case-entry="${item.id}"><span>中国案例 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases"><span>海外回测</span><strong>3 个历史案例</strong><small>可救、重构与淘汰</small></button></div><button data-overview-view="cases" class="primary-button">进入案例试跑</button></section>
     ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
@@ -426,13 +580,13 @@ function wireAssetRows() {
 
 function renderCaseStudies() {
   const item = realCases.find(entry => entry.id === selectedRealCaseId) || realCases[0];
-  const other = realCases.find(entry => entry.id !== item.id);
   root.innerHTML = `<div class="view-heading case-heading"><div><p class="eyebrow">Real-world pilot · 公开信息试跑</p><h2>不是展示资料，而是让真实案例走完整条决策逻辑</h2><p>事实、模型推断和调整情景分别标记。概率区间与增量为首轮研究性模拟，用于校准方法，不构成医学或投资建议。</p></div><span class="draft-badge">证据截止 ${item.evidenceCutoff}</span></div>
     <div class="case-switcher" role="tablist" aria-label="选择真实案例">${realCases.map(entry=>`<button role="tab" data-real-case="${entry.id}" aria-selected="${entry.id===item.id}" class="${entry.id===item.id?"active":""}"><span>${entry.stage}</span><strong>${entry.asset}</strong><small>${entry.target}</small></button>`).join("")}</div>
     <section class="case-verdict panel"><div class="case-identity"><span class="fact-label">公开事实</span><h2>${item.asset}</h2><p>${item.modality} · ${item.target} · ${item.stage}</p><small>当前公开方向：${item.currentUse}<br>${item.rights}</small></div><div class="case-main-verdict"><span>系统当前判断</span><strong class="case-status status-${item.verdictClass}">${item.verdict}</strong><p>${item.recommendation}</p></div><div class="case-probability"><span>研究性预测区间</span><strong>${item.probability}</strong><small>${item.probabilityLabel}</small><i><b style="width:${item.confidence}%"></b></i><em>证据置信度 ${item.confidence}%</em></div></section>
+    ${item.backtest ? `<section class="case-backtest panel"><div><span>模型可见信息截止</span><strong>${item.evidenceCutoff}</strong></div><div><span>当时需要回答</span><p>${item.backtest.task}</p></div><div><span>后来真实结果 · 不进入初始预测</span><strong>${item.backtest.outcomeDate}</strong><p>${item.backtest.outcome}</p></div></section>` : ""}
     <section class="case-question panel"><span>这个案例真正要回答的问题</span><h2>${item.question}</h2><p>系统不会把“有信号”直接等同于“会成功”，而是继续寻找可以改变结论的开发变量。</p></section>
     <section class="case-path"><div class="overview-section-head"><div><p class="eyebrow">案例如何走过系统</p><h2>先判断资格，再提出调整</h2></div><span>点击展开每一步依据</span></div>
-      ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">支持继续研究</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
+      ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", item.step1Summary || `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">关键支持证据</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
       ${disclosure("STEP 2A · 重新开发成功的可能性有多大？", `${item.probability}，置信度${item.confidence}%；这是下一阶段里程碑概率，不是最终上市概率。`, `<div class="case-calculation"><div><span>阶段先验</span><p>按${item.stage}和相应适应症设定基础区间。</p></div><i></i><div><span>证据修正</span><p>人体疗效、安全、机制一致性与样本质量向上或向下修正。</p></div><i></i><div><span>不确定性收缩</span><p>样本量、对照、缺失和冲突决定区间宽度与置信度。</p></div></div><div class="formula-note"><strong>当前输出</strong><span>${item.probabilityLabel}：${item.probability}。正式数值需要历史案例回测后重新校准。</span></div>`)}
       ${disclosure("STEP 3 · 项目应该怎么调整？", item.recommendation, `<div class="adjustment-table"><div class="adjustment-head"><span>调整杠杆</span><span>建议</span><span>模拟影响</span><span>为什么</span></div>${item.adjustments.map(row=>`<div><b>${row.lever}</b><p>${row.action}</p><strong>${row.impact}</strong><small>${row.reason}</small></div>`).join("")}</div><div class="next-action case-next"><span>下一最佳实验</span><strong>${item.nextExperiment}</strong><small>停止规则 · ${item.stopRule}</small></div>`, true)}
       ${disclosure("证据来源与边界", "每个事实回到公开来源；推断和模拟不得伪装成事实。", `<div class="source-link-list">${item.sources.map(source=>`<a href="${source.url}" target="_blank" rel="noreferrer"><span>${source.tier}</span><strong>${source.title}</strong><small>打开原始来源</small></a>`).join("")}</div><div class="evidence-boundary"><div><span class="fact-label">事实</span><p>来源中明确披露的人群、结果、阶段与权利信息。</p></div><div><span class="model-label">模型推断</span><p>海选结论、成功概率区间与证据置信度。</p></div><div><span class="scenario-label">情景建议</span><p>适应症、人群和试验调整，以及模拟概率变化。</p></div></div>`)}
@@ -791,7 +945,10 @@ const step2Candidates = [
   { id:"GUSA-BROAD", asset:"Gusacitinib", indication:"免疫炎症适应症", plan:"广泛人群原路径优化", stage:"Phase 2", pos:36, futureValue:80, timeMonths:30, cost:68, commercialLife:8.7, strategic:73, confidence:68, stability:62, missing:4, conflicts:2, gate:"通过", drivers:["沿用现有临床基础","可减少早期机制验证工作","目标人群规模相对更大"], unknown:"广泛人群可能稀释疗效信号并提高试验规模。", template:"Phase 2：临床信号、剂量、患者选择优先" },
   { id:"BLKR-EXPAND", asset:"BLKR201", indication:"CNS 适应症 B", plan:"新适应症扩展", stage:"Phase 1", pos:31, futureValue:91, timeMonths:26, cost:46, commercialLife:12.1, strategic:84, confidence:49, stability:45, missing:9, conflicts:0, gate:"通过", drivers:["未来市场与未满足需求较高","特殊分子属性可能适配新疾病场景","具备平台数据复用空间"], unknown:"疾病相关性证据仍偏早期，排序对关键假设高度敏感。", template:"Phase 1：PK/PD、靶点结合与安全窗优先" },
   { id:"HBM4003-MCRC", asset:"HBM4003", indication:"无肝转移MSS mCRC", plan:"生物标志物富集 + PD-1联合确认", stage:"Phase 2", pos:52, intervalLow:45, intervalHigh:60, futureValue:82, timeMonths:24, cost:58, commercialLife:10.4, strategic:79, confidence:58, stability:55, missing:5, conflicts:2, gate:"通过", drivers:["公开Ⅱ期队列观察到客观缓解信号","Treg清除与PD-1联合具有机制合理性","无肝转移人群提供可验证的富集假设"], unknown:"小样本非随机结果能否在前瞻性分层研究中重复。", template:"Phase 2：临床信号、患者选择、安全与对照证据优先", realCase:true },
-  { id:"HBM1020-ENRICH", asset:"HBM1020", indication:"HHLA2高表达实体瘤", plan:"PD-L1阴性/耐药人群富集扩展", stage:"Phase 1", pos:38, intervalLow:30, intervalHigh:45, futureValue:76, timeMonths:20, cost:37, commercialLife:12.8, strategic:75, confidence:39, stability:36, missing:8, conflicts:1, gate:"通过", drivers:["B7H7/HHLA2提供差异化免疫逃逸假设","早期安全性支持继续探索","生物标志物富集可以低成本验证核心假设"], unknown:"疾病稳定能否转化为机制一致、可重复的客观缓解。", template:"Phase 1：靶点表达、PK/PD、生物标志物与早期疗效优先", realCase:true }
+  { id:"HBM1020-ENRICH", asset:"HBM1020", indication:"HHLA2高表达实体瘤", plan:"PD-L1阴性/耐药人群富集扩展", stage:"Phase 1", pos:38, intervalLow:30, intervalHigh:45, futureValue:76, timeMonths:20, cost:37, commercialLife:12.8, strategic:75, confidence:39, stability:36, missing:8, conflicts:1, gate:"通过", drivers:["B7H7/HHLA2提供差异化免疫逃逸假设","早期安全性支持继续探索","生物标志物富集可以低成本验证核心假设"], unknown:"疾病稳定能否转化为机制一致、可重复的客观缓解。", template:"Phase 1：靶点表达、PK/PD、生物标志物与早期疗效优先", realCase:true },
+  { id:"FITUSIRAN-ATDR", asset:"Fitusiran", indication:"血友病A/B", plan:"AT活性指导的个体化剂量与风险管理", stage:"Phase 3", pos:62, intervalLow:55, intervalHigh:70, futureValue:78, timeMonths:24, cost:58, commercialLife:10.0, strategic:72, confidence:74, stability:72, missing:3, conflicts:2, gate:"通过（安全性条件）", drivers:["出血控制与靶点调控仍有支持","严重安全风险与暴露强度存在可干预联系","动态剂量可以直接检验能否恢复净获益"], unknown:"AT目标窗口内能否稳定保留疗效并把严重血栓降至可接受水平。", template:"Phase 3：净临床获益、安全性风险管理与可执行性优先", realCase:true },
+  { id:"ETRIPAMIL-RAPID", asset:"Etripamil", indication:"阵发性室上性心动过速", plan:"30分钟主要终点 + 必要时重复给药", stage:"Phase 3", pos:63, intervalLow:55, intervalHigh:70, futureValue:71, timeMonths:22, cost:45, commercialLife:9.2, strategic:70, confidence:70, stability:68, missing:3, conflicts:1, gate:"通过", drivers:["早期转复信号与快速起效药理一致","终点时间窗和给药方案可直接重构","院外自我用药具有清晰差异化"], unknown:"预设30分钟窗口能否独立重复早期转复获益。", template:"Phase 3：预设终点、给药方案与临床可感知获益优先", realCase:true },
+  { id:"VERUBEC-STOP", asset:"Verubecestat", indication:"前驱期阿尔茨海默病", plan:"不继续大型临床；仅保留机制反证", stage:"Phase 3", pos:9, intervalLow:5, intervalHigh:15, futureValue:24, timeMonths:40, cost:95, commercialLife:6.0, strategic:18, confidence:86, stability:90, missing:1, conflicts:0, gate:"不通过", drivers:["充分靶点调控未转化为临床获益","大型Ⅲ期因无效提前终止","不良事件进一步压缩净获益空间"], unknown:"是否存在足够强的新人体因果证据解释靶点调控与临床无效之间的断裂。", template:"Phase 3失败：临床获益、机制因果链与停止规则优先", realCase:true }
 ];
 
 function getStep2CandidatePool() {
@@ -829,7 +986,7 @@ function calculateStep2(candidate) {
   const capitalEfficiency = clamp(Math.round(riskAdjustedValue / candidate.cost * 100));
   const priority = step2Lens === "priority" ? resourcePriority : step2Lens === "intrinsic" ? intrinsic : step2Lens === "capital" ? capitalEfficiency : Math.round(pos);
   const tier = priority >= 70 ? "Tier 1" : priority >= 58 ? "Tier 2" : "Tier 3";
-  const action = candidate.confidence < 55 ? "先补关键证据" : priority >= 72 ? "优先投入" : priority >= 65 ? "进入重点尽调" : priority >= 58 ? "先解除一个关键风险" : "持续观察";
+  const action = candidate.gate === "不通过" ? "停止投入 / 仅保留反证研究" : candidate.confidence < 55 ? "先补关键证据" : priority >= 72 ? "优先投入" : priority >= 65 ? "进入重点尽调" : priority >= 58 ? "先解除一个关键风险" : "持续观察";
   return { ...candidate, factors, intrinsic, resourcePriority, riskAdjustedValue, capitalEfficiency, priority, tier, action };
 }
 
@@ -858,7 +1015,8 @@ function renderLogicDictionary() {
 const stagePredictionTemplates = {
   Preclinical: { label:"临床前模板", weights:[["靶点与机制",32],["人类遗传学",22],["转化证据",20],["分子属性",18],["临床先例",8]] },
   "Phase 1": { label:"Phase 1 模板", weights:[["PK / 暴露",26],["靶点结合",24],["安全窗",22],["机制证据",16],["早期疗效",12]] },
-  "Phase 2": { label:"Phase 2 模板", weights:[["临床疗效",30],["患者选择",22],["剂量反应",18],["安全与耐受",18],["终点与设计",12]] }
+  "Phase 2": { label:"Phase 2 模板", weights:[["临床疗效",30],["患者选择",22],["剂量反应",18],["安全与耐受",18],["终点与设计",12]] },
+  "Phase 3": { label:"Phase 3 模板", weights:[["确认性疗效",30],["安全与净获益",25],["终点与统计设计",20],["剂量与风险管理",15],["执行与监管可接受性",10]] }
 };
 
 function calculatePrediction(candidate) {
@@ -953,7 +1111,10 @@ const step3FailureMaps = {
   Sprifermin:{ biology:18,molecule:12,pk:15,targetEngagement:20,dose:32,patient:58,endpoint:78,heterogeneity:66,trial:64,operational:28 },
   "anti-CD226":{ biology:34,molecule:20,pk:38,targetEngagement:55,dose:48,patient:62,endpoint:44,heterogeneity:60,trial:36,operational:22 },
   HBM4003:{ biology:18,molecule:14,pk:20,targetEngagement:24,dose:40,patient:78,endpoint:46,heterogeneity:72,trial:65,operational:28 },
-  HBM1020:{ biology:42,molecule:18,pk:28,targetEngagement:62,dose:36,patient:82,endpoint:48,heterogeneity:76,trial:58,operational:24 }
+  HBM1020:{ biology:42,molecule:18,pk:28,targetEngagement:62,dose:36,patient:82,endpoint:48,heterogeneity:76,trial:58,operational:24 },
+  Fitusiran:{ biology:8,molecule:18,pk:22,targetEngagement:12,dose:92,patient:20,endpoint:18,heterogeneity:16,trial:38,operational:48 },
+  Etripamil:{ biology:12,molecule:14,pk:20,targetEngagement:18,dose:58,patient:24,endpoint:94,heterogeneity:25,trial:90,operational:28 },
+  Verubecestat:{ biology:88,molecule:24,pk:10,targetEngagement:8,dose:46,patient:68,endpoint:25,heterogeneity:44,trial:22,operational:18 }
 };
 
 const step3ScenarioDefinitions = [
@@ -1090,6 +1251,9 @@ function wireStep3(candidate, scenarios, selected, writebackId) {
 }
 
 const predictionHistory = [
+  { asset:"Fitusiran", version:"BACKTEST-2020-1030-V1", date:"2020-10-30", cutoff:"2020-10-30", model:"v0.9-backtest", pos:62, interval:"55–70%", recommendation:"改用AT活性指导剂量并重构血栓风险管理", evidence:8, unknown:"目标AT窗口能否兼顾出血控制和血栓安全", immutable:true },
+  { asset:"Etripamil", version:"BACKTEST-2020-0323-V1", date:"2020-03-23", cutoff:"2020-03-23", model:"v0.9-backtest", pos:63, interval:"55–70%", recommendation:"以30分钟预设终点和重复给药重做关键试验", evidence:7, unknown:"早期转复信号能否在独立研究中复制", immutable:true },
+  { asset:"Verubecestat", version:"BACKTEST-2018-0213-V1", date:"2018-02-13", cutoff:"2018-02-13", model:"v0.9-backtest", pos:9, interval:"5–15%", recommendation:"停止大型临床，仅在出现强机制反证时重启", evidence:9, unknown:"更早人群是否真能修复生物标志物与临床获益的断裂", immutable:true },
   { asset:"HBM4003", version:"PRED-2026-1005-PILOT-01", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.9-pilot", pos:52, interval:"45–60%", recommendation:"优先验证无肝转移MSS mCRC富集策略", evidence:7, unknown:"小样本非随机结果能否前瞻性重复", immutable:true },
   { asset:"HBM1020", version:"PRED-2026-1005-PILOT-01", date:"2026-10-05", cutoff:"2026-10-05", model:"v0.9-pilot", pos:38, interval:"30–45%", recommendation:"先做HHLA2表达分层的富集扩展", evidence:5, unknown:"疾病稳定能否转化为客观缓解", immutable:true },
   { asset:"Gusacitinib", version:"PRED-2026-0618-V1", date:"2026-06-18", cutoff:"2026-06-15", model:"v0.5-demo", pos:39, interval:"25–54%", recommendation:"补充患者分层证据", evidence:41, unknown:"预测性 biomarker 尚未定义", immutable:true },
@@ -1103,7 +1267,7 @@ function renderRegistry() {
   const assetNames = [...new Set(predictionHistory.map(item=>item.asset))];
   const records = predictionHistory.filter(item=>item.asset===registryAsset);
   const latest = records[records.length-1];
-  root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">Prediction Version History</p><h2>为什么要保留每一次预测？</h2><p>当前决策始终使用最新证据和最新预测；旧版本只作为只读历史记录保留。新证据出现时，系统生成一个新版本，而不是改写当时的答案，这样才能判断模型当时是否准确，以及结论为什么发生变化。</p></div><span class="draft-badge">当前用最新版本 · 历史版本只读</span></div><div class="registry-toolbar">${assetNames.map(name=>`<button data-registry-asset="${name}" class="${registryAsset===name?"active":""}">${name}</button>`).join("")}</div><section class="panel registry-hero"><div><span>当前资产</span><h2>${registryAsset}</h2><p>${records.length} 个预测版本 · 当前决策使用最新版本 · 最新证据截止 ${latest.cutoff}</p></div><div><span>最新 PoS</span><strong>${latest.pos}%</strong><small>80% 区间 ${latest.interval}</small></div><div><span>当前建议</span><strong>${latest.recommendation}</strong><small>${latest.unknown}</small></div></section><section class="registry-timeline">${records.map((item,index)=>`<article class="panel"><div class="registry-node"><span>${index+1}</span><i></i></div><div class="registry-version"><small>${item.date}</small><h3>${item.version}</h3><p>证据截止 ${item.cutoff} · ${item.model}</p></div><div class="registry-pos"><span>PoS</span><strong>${item.pos}%</strong><small>${item.interval}</small></div><div class="registry-change"><span>关键未知项</span><p>${item.unknown}</p><small>${item.evidence} 条结构化证据</small></div><div class="registry-recommendation"><span>当时建议</span><strong>${item.recommendation}</strong><small>${item.immutable?"历史版本已锁定 · 仅供回看":"草稿"}</small></div></article>`).join("")}</section><section class="panel registry-calibration"><div><p class="eyebrow">如何使用这份记录</p><h2>新证据更新当前判断，旧版本用于回测</h2></div><div><span>01</span><p>预测时保存证据快照与模型版本</p></div><div><span>02</span><p>新证据生成新版本，当前决策自动采用最新版</p></div><div><span>03</span><p>临床结果公布后，比较当时预测与真实结果</p></div><div><span>04</span><p>校准先验、变量、权重和置信区间</p></div><em>当前为结构演示，真实结果尚未接入</em></section>`;
+  root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">Prediction Version History</p><h2>为什么要保留每一次预测？</h2><p>当前决策始终使用最新证据和最新预测；旧版本只作为只读历史记录保留。新证据出现时，系统生成一个新版本，而不是改写当时的答案，这样才能判断模型当时是否准确，以及结论为什么发生变化。</p></div><span class="draft-badge">当前用最新版本 · 历史版本只读</span></div><div class="registry-toolbar">${assetNames.map(name=>`<button data-registry-asset="${name}" class="${registryAsset===name?"active":""}">${name}</button>`).join("")}</div><section class="panel registry-hero"><div><span>当前资产</span><h2>${registryAsset}</h2><p>${records.length} 个预测版本 · 当前决策使用最新版本 · 最新证据截止 ${latest.cutoff}</p></div><div><span>最新 PoS</span><strong>${latest.pos}%</strong><small>80% 区间 ${latest.interval}</small></div><div><span>当前建议</span><strong>${latest.recommendation}</strong><small>${latest.unknown}</small></div></section><section class="registry-timeline">${records.map((item,index)=>`<article class="panel"><div class="registry-node"><span>${index+1}</span><i></i></div><div class="registry-version"><small>${item.date}</small><h3>${item.version}</h3><p>证据截止 ${item.cutoff} · ${item.model}</p></div><div class="registry-pos"><span>PoS</span><strong>${item.pos}%</strong><small>${item.interval}</small></div><div class="registry-change"><span>关键未知项</span><p>${item.unknown}</p><small>${item.evidence} 条结构化证据</small></div><div class="registry-recommendation"><span>当时建议</span><strong>${item.recommendation}</strong><small>${item.immutable?"历史版本已锁定 · 仅供回看":"草稿"}</small></div></article>`).join("")}</section><section class="panel registry-calibration"><div><p class="eyebrow">如何使用这份记录</p><h2>新证据更新当前判断，旧版本用于回测</h2></div><div><span>01</span><p>预测时保存证据快照与模型版本</p></div><div><span>02</span><p>新证据生成新版本，当前决策自动采用最新版</p></div><div><span>03</span><p>临床结果公布后，比较当时预测与真实结果</p></div><div><span>04</span><p>校准先验、变量、权重和置信区间</p></div><em>3个海外历史案例已接入真实结果，其余仍为结构演示</em></section>`;
   wrapElementInDisclosure(document.querySelector(".registry-timeline"), "查看全部历史预测版本", "旧版本保留当时的证据和结论；最新版本负责支持当前决策。", false);
   document.querySelectorAll("[data-registry-asset]").forEach(button=>button.addEventListener("click",()=>{registryAsset=button.dataset.registryAsset;renderRegistry();}));
 }
