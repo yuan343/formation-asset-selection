@@ -107,10 +107,10 @@ const historicalCases = [
     probability: "自动计算中",
     probabilityLabel: "重构方案恢复可开发性并进入注册路径",
     confidence: 74,
-    evidenceCutoff: "2020-10-30（历史回测）",
+    evidenceCutoff: "2021-02-05（历史回测）",
     step1Summary: "潜在可救：疗效与靶点调控仍有支持，但原固定剂量方案触发安全性硬风险，必须先重构暴露和监测。",
     backtest: {
-      task: "只使用第二次暂停前已公开的信息，判断项目应停止还是重构。",
+      task: "只使用2021年修订方案公开时可获得的信息，判断重构后能否恢复开发并进入注册路径。",
       outcomeDate: "2025-03-28",
       outcome: "FDA批准Qfitlia；获批方案改为AT活性指导的个体化剂量，而非原固定80 mg月给药。",
       actualSuccess: true,
