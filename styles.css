@@ -990,6 +990,7 @@ dialog::backdrop { background: rgba(8,26,41,.5); backdrop-filter: blur(3px); }
   .clarity-hero aside { border-left:0; border-top:1px solid rgba(255,255,255,.12); }
   .question-journey-grid { grid-template-columns:1fr; }
   .question-journey-grid button { min-height:0; }
+  .journey-feedback { align-items:flex-start; justify-content:flex-start; }
   .case-entry-assets,.case-switcher,.case-verdict,.case-two-column,.source-link-list,.evidence-boundary,.prediction-detail-pair { grid-template-columns:1fr; }
   .case-switcher button { grid-template-columns:1fr; gap:4px; }
   .case-verdict > div + div { border-left:0; border-top:1px solid var(--soft-line); }
