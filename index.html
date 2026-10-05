@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Formation Asset Selection & Redesign Engine 可点击产品草稿" />
+    <meta name="description" content="Formation Asset Selection &amp; Redesign Engine 可点击产品草稿" />
     <title>Formation Asset Selection</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="styles.css" />
@@ -23,23 +23,32 @@
           <button class="nav-item active" data-view="workspace">
             <span class="nav-icon">01</span><span>决策总览</span>
           </button>
+          <button class="nav-item" data-view="cases">
+            <span class="nav-icon">02</span><span>真实案例试跑</span>
+          </button>
+          <button class="nav-item" data-view="radar">
+            <span class="nav-icon">03</span><span>STEP 0 · 机会雷达</span>
+          </button>
           <button class="nav-item" data-view="recoverability">
-            <span class="nav-icon">02</span><span>STEP 1 · 海选池</span>
+            <span class="nav-icon">04</span><span>STEP 1 · 海选池</span>
           </button>
           <button class="nav-item" data-view="ranking">
-            <span class="nav-icon">03</span><span>STEP 2 · 选择引擎</span>
+            <span class="nav-icon">05</span><span>STEP 2 · 预测与决策</span>
           </button>
           <button class="nav-item" data-view="scenario">
-            <span class="nav-icon">04</span><span>STEP 3 · 场景实验室</span>
+            <span class="nav-icon">06</span><span>STEP 3 · 场景实验室</span>
+          </button>
+          <button class="nav-item" data-view="registry">
+            <span class="nav-icon">07</span><span>预测登记册</span>
           </button>
           <button class="nav-item" data-view="evidence">
-            <span class="nav-icon">05</span><span>证据与审计</span>
+            <span class="nav-icon">08</span><span>证据与审计</span>
           </button>
         </nav>
 
         <div class="sidebar-note">
           <span class="note-dot"></span>
-          <div><strong>v0.7 完整草版</strong><small>结论 → 证据 → STEP 1–3</small></div>
+          <div><strong>v0.9 决策引擎草版</strong><small>先看懂 → 再展开 → 用案例验证</small></div>
         </div>
       </aside>
 
@@ -50,22 +59,30 @@
             <h1 id="page-title">决策总览</h1>
           </div>
           <div class="top-actions">
-            <span class="snapshot">模型 v0.7 · 在线演示版</span>
+            <span class="snapshot">模型 v0.9 · 公开案例 + 演示计算</span>
             <button class="ghost-button" id="method-button">方法说明</button>
           </div>
         </header>
 
-        <section class="pipeline" aria-label="三阶段决策链">
-          <button class="pipeline-step active" data-view="recoverability">
-            <span>STEP 1</span><strong>海选池</strong><small>初筛 + 可救性判断</small>
+        <section class="pipeline pipeline-five" aria-label="五个核心问题">
+          <button class="pipeline-step" data-view="radar">
+            <span>STEP 0</span><strong>哪里有机会？</strong><small>发现变化</small>
           </button>
           <div class="pipeline-connector"></div>
-          <button class="pipeline-step" data-view="ranking">
-            <span>STEP 2</span><strong>候选分层与排序</strong><small>PoS + Value + Time + Cost</small>
+          <button class="pipeline-step active" data-view="recoverability">
+            <span>STEP 1</span><strong>还有没有救？</strong><small>排除错误</small>
+          </button>
+          <div class="pipeline-connector"></div>
+          <button class="pipeline-step" data-view="ranking" data-step2-section-target="prediction">
+            <span>STEP 2A</span><strong>会不会成功？</strong><small>预测概率</small>
+          </button>
+          <div class="pipeline-connector"></div>
+          <button class="pipeline-step" data-view="ranking" data-step2-section-target="decision">
+            <span>STEP 2B</span><strong>值不值得优先投入？</strong><small>资源排序</small>
           </button>
           <div class="pipeline-connector"></div>
           <button class="pipeline-step" data-view="scenario">
-            <span>STEP 3</span><strong>假设场景优化</strong><small>Quick scan + Deep optimization</small>
+            <span>STEP 3</span><strong>入选后怎么调整？</strong><small>重构路径</small>
           </button>
         </section>
 
@@ -76,10 +93,10 @@
     <dialog id="method-dialog">
       <form method="dialog" class="dialog-card">
         <div class="dialog-head">
-          <div><p class="eyebrow">方法 v0.7</p><h2>结论先行，逐层追溯证据</h2></div>
+          <div><p class="eyebrow">方法 v0.9</p><h2>从机会发现到可验证建议</h2></div>
           <button class="close-button" aria-label="关闭">×</button>
         </div>
-        <p>决策总览汇总当前建议、支持证据、关键未知项和下一步行动；STEP 1 从全阶段、全领域和全分子类型中识别可能再次研发的资产，STEP 2 比较风险调整价值与资源优先级，STEP 3 生成并比较假设场景。事实、计算结果与待验证假设始终分层保存。</p>
+        <p>STEP 0 主动发现资产与异常变化；STEP 1 判断是否值得正式研究；STEP 2A 独立预测科学与临床成功概率；STEP 2B 再结合价值、时间、成本与资源约束确定投入优先级；入选项目进入 STEP 3 生成调整方案。STEP 3 的新方案会回写 STEP 2A / 2B 重新计算，形成反馈闭环。每次预测进入登记册，事实、计算结果与待验证假设始终分层保存。</p>
         <div class="method-grid">
           <div><span>海选范围</span><strong>Any stage · TA · modality · status</strong></div>
           <div><span>证据标签</span><strong>[F] [C] [P] [E]</strong></div>
