@@ -560,6 +560,24 @@ const sourcePolicy = [
   { tier: "D", title: "推断与缺口", sources: "二手报道、模型推断、未能交叉验证的信息", use: "只能降低置信度或生成 Research Trigger" }
 ];
 
+const plannedDataSources = [
+  { key:"clinical", name:"临床试验主数据", sources:"ClinicalTrials.gov、CDE药物临床试验登记平台、WHO ICTRP及各国注册库", fields:"状态、阶段、人群、剂量、终点、入组与结果", cadence:"每日 / 每周", role:"发现变化并建立试验历史版本", status:"优先接入" },
+  { key:"regulatory", name:"监管与批准", sources:"NMPA / CDE、FDA Drugs@FDA、EMA EPAR及安全通告", fields:"批准、标签、审评意见、安全、剂量与监管路径", cadence:"事件触发", role:"确认获益风险与最终监管结论", status:"优先接入" },
+  { key:"company", name:"公司法定披露", sources:"港交所、SEC、交易所公告、年报、管线页与正式新闻稿", fields:"项目状态、停止原因、权利、交易与资金变化", cadence:"每日", role:"识别暂停、放弃、转让与策略变化", status:"优先接入" },
+  { key:"science", name:"科学与机制", sources:"PubMed、Open Targets、GWAS Catalog、ChEMBL、UniProt与同行评议全文", fields:"Target、MoA、遗传学、同类先例、PK/PD与转化证据", cadence:"每周 / 每月", role:"建立生物学与人体因果证据链", status:"分批接入" },
+  { key:"rights", name:"专利、权属与交易", sources:"WIPO、专利数据库、Orange / Purple Book及交易文件", fields:"专利、FTO、独占期、许可区域和交易限制", cadence:"每月 / 事件触发", role:"支持STEP 2价值和执行可行性", status:"后续接入" },
+  { key:"internal", name:"尽调与内部数据", sources:"原始临床数据、SAP、PK/PD、CMC、监管沟通纪要与专家访谈", fields:"公开资料无法回答的关键未知项", cadence:"项目触发", role:"把公开信息预测升级为正式投资判断", status:"需授权导入" }
+];
+
+const evidencePipeline = [
+  ["01","监测与抓取","保留原始页面、PDF和历史版本"],
+  ["02","身份标准化","统一资产、靶点、公司和试验编号"],
+  ["03","事实抽取","把原文转成可验证、可计算的Claim"],
+  ["04","交叉核验","识别重复、冲突、缺失和选择性披露"],
+  ["05","人工检查点","关键Gate和高影响证据必须复核"],
+  ["06","锁定后计算","保存截止日与版本，再进入STEP 1—3"]
+];
+
 const driverDefinitions = {
   biology: [
     ["target", "靶点成立程度", .18], ["moa", "作用机制完整性", .17],
@@ -894,6 +912,24 @@ const validationStages = [
   { no:"05", title:"揭示结果并校准", status:"内部回测完成", statusClass:"partial", rule:"整批揭示结果后统计命中、假阳性、假阴性和概率误差；只在批次结束后统一校准。", output:`${historicalCases.length}例说明性回测完成；独立验证仍待进行` }
 ];
 
+const modelRiskRegister = [
+  { group:"数据", risk:"时间点泄漏", signal:"预测使用了截止日之后才披露的信息", impact:"虚高回测表现", control:"保存证据快照、截止日和只读预测版本", status:"已纳入" },
+  { group:"数据", risk:"选择性披露与结果缺失", signal:"试验完成但无结果，或只披露正向亚组", impact:"系统性高估", control:"缺失不记为中性；降低置信度并触发专项核查", status:"候选规则" },
+  { group:"数据", risk:"重复记录与身份混淆", signal:"同一试验跨注册库重复，资产存在多个代码名", impact:"重复计权或归错资产", control:"统一资产、试验、公司和靶点主键后再计算", status:"候选规则" },
+  { group:"统计", risk:"相关证据重复加分", signal:"论文、新闻稿和注册结果来自同一研究", impact:"把一条信号放大多次", control:"先按底层研究聚类，只计算独立证据单元", status:"候选规则" },
+  { group:"统计", risk:"基础成功率不匹配", signal:"不同阶段、治疗领域和分子类型共用同一先验", impact:"概率起点偏差", control:"按阶段 × 领域 × modality分层校准，并设置样本不足回退", status:"待历史样本" },
+  { group:"统计", risk:"小样本与临界显著", signal:"单项Ⅱ期、P值接近阈值或效应区间很宽", impact:"效应量回归、假阳性", control:"效应稳健性、区间宽度和独立重复进入修正", status:"已纳入" },
+  { group:"统计", risk:"多终点与事后切片", signal:"正向结果依赖非预设终点或亚组", impact:"夸大可重复性", control:"预设终点优先；事后信号必须独立复制", status:"已纳入" },
+  { group:"因果", risk:"安全性代替疗效", signal:"因安全可控而提高主要终点成功率", impact:"高估疗效PoS", control:"安全性只决定继续资格，对疗效仅给予有限修正", status:"已纳入" },
+  { group:"因果", risk:"靶点、分子与试验混为一层", signal:"同类成功被直接外推到当前分子和方案", impact:"因果链断点被隐藏", control:"Target → 分子 → 暴露 → TE → 疗效 → 净获益逐层计算", status:"已纳入" },
+  { group:"因果", risk:"局部暴露与剂量未确认", signal:"系统安全良好但作用组织暴露未知", impact:"错误判断剂量已优化", control:"剂量—组织暴露关系作为独立变量与Gate", status:"已纳入" },
+  { group:"临床", risk:"安慰剂、测量与依从性波动", signal:"主观或高方差终点、复杂测量、长期频繁给药", impact:"真实效应被稀释", control:"终点可靠性、中央判读、依从性和执行质量单列", status:"已纳入" },
+  { group:"临床", risk:"外部效度不足", signal:"人群、地区、线次、终点或标准治疗发生变化", impact:"早期信号无法迁移", control:"对患者、地区、终点和未来SOC做可迁移性检查", status:"候选规则" },
+  { group:"决策", risk:"可救性与单项试验成功率混合", signal:"资产仍有重构空间被解释为当前方案会成功", impact:"错误继续原方案", control:"分别输出资产可救性和下一项具体试验PoS", status:"已纳入" },
+  { group:"决策", risk:"成功定义不一致", signal:"有的案例用主要终点，有的用批准或交易", impact:"验证标签不可比较", control:"预测前锁定里程碑、时间窗和判定规则", status:"候选规则" },
+  { group:"决策", risk:"模型漂移与逐例调参", signal:"看到每个结果后立即覆盖旧权重", impact:"无法判断真实预测能力", control:"旧版本只读；新版本整批校准并重新独立验证", status:"已纳入" }
+];
+
 function getValidationMetrics() {
   const rows = historicalCases.map(item => ({
     asset:item.asset.split(" / ")[0],
@@ -908,6 +944,12 @@ function getValidationMetrics() {
   return { rows, hits, falsePositive, falseNegative, brier:brier.toFixed(2) };
 }
 
+function renderModelRiskRegister() {
+  const groups = ["数据","统计","因果","临床","决策"];
+  const incorporated = modelRiskRegister.filter(item=>item.status==="已纳入").length;
+  return `<section class="model-risk-register"><div class="model-risk-summary"><div><span>已识别漏洞</span><strong>${modelRiskRegister.length}</strong><small>持续补充，不宣称已经穷尽</small></div><div><span>已进入规则</span><strong>${incorporated}</strong><small>仍需独立案例验证效果</small></div><div><span>候选 / 待数据</span><strong>${modelRiskRegister.length-incorporated}</strong><small>显示出来但不伪装成已完成</small></div></div>${groups.map(group=>`<div class="model-risk-group"><div class="model-risk-group-head"><b>${group}漏洞</b><span>${modelRiskRegister.filter(item=>item.group===group).length}项</span></div><div class="model-risk-grid">${modelRiskRegister.filter(item=>item.group===group).map(item=>`<article><div><h3>${item.risk}</h3><em class="risk-status ${item.status==="已纳入"?"included":"candidate"}">${item.status}</em></div><p><b>识别信号</b>${item.signal}</p><p><b>可能影响</b>${item.impact}</p><small><b>控制规则</b>${item.control}</small></article>`).join("")}</div></div>`).join("")}</section>`;
+}
+
 function renderValidation() {
   const metrics = getValidationMetrics();
   const kxLearning = historicalCases.find(item=>item.id==="KX826-CN-2023").postResultLearning.result;
@@ -916,6 +958,7 @@ function renderValidation() {
     <section class="validation-workflow"><div class="overview-section-head"><div><p class="eyebrow">验证闭环</p><h2>五个步骤必须按顺序完成</h2></div><span>任何一步缺失，结论都只能叫“回测”，不能叫“验证”</span></div><div class="validation-stage-grid">${validationStages.map(stage=>`<article class="panel validation-stage"><div><span>${stage.no}</span><em class="validation-status status-${stage.statusClass}">${stage.status}</em></div><h3>${stage.title}</h3><p>${stage.rule}</p><small>${stage.output}</small></article>`).join("")}</div></section>
     <section class="panel validation-results"><div class="panel-head"><div><p class="eyebrow">当前可见结果</p><h2>${metrics.rows.length}个案例中${metrics.hits}个方向吻合，错误同样保留</h2><p>失败判定规则：预测区间上限低于${historicalBacktestModel.threshold}%。</p></div><span class="draft-badge">非独立验证集</span></div><div class="table-wrap"><table><thead><tr><th>案例</th><th>证据截止</th><th>自动预测</th><th>预测方向</th><th>后来结果</th><th>回测</th></tr></thead><tbody>${metrics.rows.map(row=>`<tr><td><strong>${row.asset}</strong><small>说明性历史回测</small></td><td>${row.cutoff}</td><td><strong>${row.result.point}%</strong><small>${row.result.low}–${row.result.high}%</small></td><td>${row.result.predictedSuccess?"保留成功可能":"预测失败"}</td><td>${row.actual}</td><td><span class="validation-hit ${row.result.hit?"hit":"miss"}">${row.result.hit?"命中":"未命中"}</span></td></tr>`).join("")}</tbody></table></div><div class="validation-error-strip"><span>假阳性 <b>${metrics.falsePositive}</b></span><span>假阴性 <b>${metrics.falseNegative}</b></span><span>方向命中率 <b>${Math.round(metrics.hits / metrics.rows.length * 100)}%</b></span><em>这些数字只描述当前${metrics.rows.length}例，不代表未来表现。</em></div></section>
     ${disclosure("查看指标与防止事后偏差的规则", `为什么${metrics.hits}/${metrics.rows.length}仍不能证明模型可靠？`, `<div class="validation-rule-grid"><article><span>数据截止</span><p>只允许使用截止日前已经公开、可追溯的事实；事件发生但尚未披露的信息不可使用。</p></article><article><span>版本冻结</span><p>验证期间不得因单个案例结果修改先验、乘数或阈值；任何变更都生成新版本。</p></article><article><span>批量揭盲</span><p>一批预测全部锁定后再统一揭示结果，避免看一个结果就调一次模型。</p></article><article><span>方向错误</span><p>假阳性是预测可成功但实际失败；假阴性是预测失败但实际成功，两者必须分别统计。</p></article><article><span>概率校准</span><p>Brier分数衡量概率与0/1结果的距离；还需要按概率区间比较长期实际成功频率。</p></article><article><span>模型升级</span><p>校准后的规则必须作为新版本重新接受独立验证，不能覆盖旧预测记录。</p></article></div>`)}
+    ${disclosure("模型风险与漏洞登记册", `${modelRiskRegister.length}项已识别漏洞；区分已纳入、候选规则和待历史样本。`, renderModelRiskRegister())}
     <section class="panel calibration-candidate"><div class="panel-head"><div><p class="eyebrow">v1.1 candidate · 模型学习</p><h2>旧答案不覆盖，新规则另起版本</h2><p>KX-826的63%仍作为v1.0假阳性保留；下面只是把错误转成下一版可检验的规则。</p></div><span class="draft-badge">待独立验证</span></div><div class="calibration-compare"><article><span>v1.0 锁定记录</span><strong>63%</strong><small>50–76% · 未命中 · 继续计入4/5和Brier 0.17</small></article><i>→</i><article><span>v1.1 事后校准示例</span><strong>${kxLearning.point}%</strong><small>${kxLearning.low}–${kxLearning.high}% · 不计入命中率</small></article></div><div class="calibration-change-grid"><article><b>降低正向加分</b><p>Ⅱ期阳性 ×1.80→×1.45；同类机制 ×1.20→×1.10；安全性 ×1.25→×1.05。</p></article><article><b>加强重复性惩罚</b><p>无独立重复 ×0.60；安慰剂与测量波动 ×0.60。</p></article><article><b>补齐原来缺失变量</b><p>剂量—局部暴露 ×0.75；依从性与执行风险 ×0.85。</p></article><article><b>分开两个问题</b><p>“资产是否可救”与“下一项具体试验是否成功”分别输出，不再共用一个概率。</p></article></div><div class="model-learning-warning"><b>验证要求</b><span>${postResultCalibrationModel.version}只能在新的、未参与调参的独立案例上验证；通过前不能替代v1.0。</span></div></section>
     <section class="panel validation-next"><div><p class="eyebrow">本轮学到什么</p><h2>未命中的国内失败案例，指出了下一轮要补的变量</h2><p>KX-826 0.5% BID提示：随机Ⅱ期阳性仍可能在Ⅲ期被安慰剂效应、测量方差、依从性和效应量回归击穿。下一版应先增加这些变量，再建立真正独立的验证集。</p></div><div><button data-validation-view="cases" class="secondary-button">查看说明性案例</button><button data-validation-view="registry" class="primary-button">查看锁定记录</button></div></section>`;
   document.querySelectorAll("[data-validation-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.validationView)));
@@ -1075,6 +1118,7 @@ function renderRecoverability() {
   root.innerHTML = `<div class="view-heading step1-heading"><div><h2>STEP 1 · 海选池</h2><p>判断资产是否存在再次研发的合理可能性。全阶段、全领域、全类型、全状态纳入；系统先形成自动判断，人工模式只用于复核、纠正和情景模拟。</p></div></div>
     <div class="step1-toolbar panel"><div class="scope-chip"><b>全范围海选</b><span>临床前 → 临床 · 不限治疗领域 · 不限分子类型 · 不限资产状态</span></div><div class="mode-switch" aria-label="评估模式"><button data-step1-mode="auto" class="${step1Mode === "auto" ? "active" : ""}">系统自动评估</button><button data-step1-mode="expert" class="${step1Mode === "expert" ? "active" : ""}">专家复核 / 情景模拟</button></div><label class="preset-picker"><span>载入演示资产</span><select id="step1-preset" class="select-box">${Object.entries(step1Presets).map(([key,preset]) => `<option value="${key}" ${key===step1PresetKey?"selected":""}>${preset.label}</option>`).join("")}</select></label></div>
     <div class="automation-banner ${step1Mode}"><div><b>${origin}</b><span>${step1Mode === "auto" ? "左侧数值由资产事实库、来源证据和规则引擎自动生成；切换到人工模式后才可调整。" : "当前修改只生成模拟结论，不会覆盖系统事实或原始评估。"}</span></div><div class="source-summary"><span>${step1State.sourceSummary.facts} 条事实</span><span>${step1State.sourceSummary.sourceTypes} 类来源</span><span>${step1State.sourceSummary.unresolved} 项待确认</span></div></div>
+    <section class="panel step1-source-entry"><div><p class="eyebrow">计划数据库输入</p><h2>海选读取六类来源，但数据库计划统一放在“证据与审计”</h2><p>临床注册、监管、公司披露、科学机制、权属交易和授权导入的尽调数据先形成证据快照，再进入1A—1E；来源缺失只降低置信度，不自动判为失败。</p></div><div class="step1-source-tags">${plannedDataSources.map(source=>`<span>${source.name}</span>`).join("")}</div><button data-step1-source-plan class="secondary-button">查看完整数据计划</button></section>
     <section class="screening-policy"><div class="screening-policy-head"><div><p class="eyebrow">海选决策原则</p><h2>五种去向，不把“未知”误判为“没救”</h2></div><span>候选规则 · 待专家校准</span></div><div class="screening-policy-grid">${screeningOutcomes.map(item => `<article class="policy-${item.key}"><b>${item.title}</b><p>${item.rule}</p><small>${item.action}</small></article>`).join("")}</div></section>
     <div class="step1-layout"><div class="assessment-builder">
       <section class="panel assessment-section"><div class="assessment-section-head"><span class="section-number">1A</span><div><h2>基础准入检查</h2><p>范围不设限；这里只检查资产身份、最低证据和来源可追溯性。权利问题影响执行，不等同科学失败。</p></div><span class="live-engine">${step1Mode === "auto" ? "自动" : "模拟"}</span></div><div class="eligibility-grid">${[["identity","资产身份与别名已确认"],["evidence","存在最低限度可分析证据"],["traceability","关键事实可追溯到来源"],["rights","权利或交易可能性存在"]].map(([key,label]) => `<label class="check-card"><input data-step1-eligibility="${key}" type="checkbox" ${step1State.eligibility[key]?"checked":""} ${disabled}/><span><b>${label}</b><small>${key === "rights" ? "执行变量 · 不等同科学失败" : "系统自动生成的准入规则"}</small></span></label>`).join("")}</div></section>
@@ -1085,6 +1129,7 @@ function renderRecoverability() {
     </div><aside id="step1-result" class="panel decision-console">${step1ResultHTML(result)}</aside></div>`;
   simplifyStep1Layout();
   wireStep1Engine();
+  document.querySelector("[data-step1-source-plan]")?.addEventListener("click",()=>switchView("evidence"));
 }
 
 function wrapElementInDisclosure(element, title, summary, open=false) {
@@ -1180,6 +1225,8 @@ PD / 靶点结合|直接计算 + 模型|PoS|[F][I][E]|结构确认 / 拟议
 持续性与一致性|直接计算 + 规则|PoS|[F][I]|结构确认
 安全性与耐受性|直接计算 + 规则|PoS / Gate|[F][I]|结构确认
 安全继续资格与疗效概率分离|规则|Gate / PoS|[F][E]|模型学习新增 / 拟议
+终点定义与成功标准一致性|规则|PoS / 验证标签|[F][I][E]|漏洞登记新增 / 拟议
+人群、地区与方案可迁移性|规则 + 统计模型|PoS / 不确定性|[F][I][E]|漏洞登记新增 / 拟议
 主要终点 PoS|预测模型|PoS / 区间|[F]|结构确认
 因果链 PoTS|预测模型|PoS / 节点概率|[F]|结构确认`) },
   { id: "market", number: 4, name: "未来市场与竞争价值", question: "预计上市时还有多大可获得价值？", metrics: parseStep2Metrics(`
@@ -1236,6 +1283,9 @@ rNPV|财务模型|价值|[F][I]|行业方法
 证据质量|规则|置信度|[F][I][E]|结构确认 / 拟议
 数据完整性|直接计算|置信度|[E]|拟议
 证据冲突|规则 + 模型|不确定性|[F][E]|结构确认 / 拟议
+证据独立性与重复计权|规则 + 图模型|PoS / 置信度|[F][I][E]|漏洞登记新增 / 拟议
+选择性披露与结果缺失|规则 + 缺失机制|置信度 / 不确定性|[F][I][E]|漏洞登记新增 / 拟议
+分层基础成功率适配|统计模型|PoS / 先验|[I][E]|漏洞登记新增 / 待历史样本
 时效性|直接计算 + 规则|置信度|[E]|拟议
 Base / Bull / Bear|情景分析|全部核心变量|[I][E]|行业方法
 敏感性分析|财务 / 统计模型|关键驱动因素|[I]|行业方法
@@ -1640,6 +1690,7 @@ function renderRegistry() {
 function renderEvidence() {
   const filtered = evidenceFilter === "ALL" ? evidence : evidence.filter(e => e.tag === evidenceFilter);
   root.innerHTML = `<div class="view-heading"><div><h2>让每一个判断都能回到来源、时间与模型版本</h2><p>事实、案例反推、外部一级来源和扩展逻辑必须分开；低等级来源只能触发研究，不能单独形成淘汰结论。</p></div></div>
+    <section class="panel data-plan"><div class="data-plan-head"><div><p class="eyebrow">Planned Data Foundation · 计划数据库</p><h2>未来投入使用时，数据从哪里来、怎样进入计算</h2><p>这是目标架构，不代表所有接口已经接通。先建设临床、监管与公司披露三类主干，再逐步加入科学、权属和授权导入的尽调数据。</p></div><span class="draft-badge">规划中 · 分批接入</span></div><div class="data-source-grid">${plannedDataSources.map(source=>`<article class="source-${source.key}"><div><span>${source.status}</span><h3>${source.name}</h3></div><p>${source.sources}</p><dl><div><dt>提取字段</dt><dd>${source.fields}</dd></div><div><dt>更新节奏</dt><dd>${source.cadence}</dd></div><div><dt>进入系统</dt><dd>${source.role}</dd></div></dl></article>`).join("")}</div><div class="data-pipeline"><div><b>进入计算前的六个检查点</b><span>任何关键来源缺失、冲突或不可追溯，都只能降低置信度或触发补证据，不能自动判定为失败。</span></div><div class="data-pipeline-flow">${evidencePipeline.map(([no,title,note],index)=>`<article><span>${no}</span><b>${title}</b><small>${note}</small></article>${index<evidencePipeline.length-1?"<i></i>":""}`).join("")}</div></div><div class="data-record-fields"><b>每条数据必须同时保存</b><span>原始链接</span><span>发布机构</span><span>发布日期</span><span>读取日期</span><span>证据截止日</span><span>原文页码</span><span>证据等级</span><span>人工复核</span><span>冲突状态</span><span>影响维度</span></div></section>
     <section class="evidence-lineage panel"><div class="evidence-lineage-head"><div><p class="eyebrow">Evidence Lineage</p><h2>证据怎样进入最终结论</h2></div><span>每一层都保留来源与转换规则</span></div><div class="lineage-flow"><article><span>01</span><b>Raw Evidence</b><small>论文、试验、监管、公司、遗传学</small></article><i></i><article><span>02</span><b>Claim</b><small>抽取可验证的事实主张</small></article><i></i><article><span>03</span><b>Factor</b><small>映射到 Biology、PK、Safety 等变量</small></article><i></i><article><span>04</span><b>Probability</b><small>按阶段和证据质量进入概率模型</small></article><i></i><article><span>05</span><b>Decision</b><small>形成 Gate、排序、情景与下一项实验</small></article></div><div class="lineage-example"><b>示例</b><span>人体遗传学研究</span><em>→</em><span>靶点—疾病因果支持</span><em>→</em><span>Target Validation</span><em>→</em><span>机制节点概率</span><em>→</em><span>PoS 区间</span></div></section>
     <div class="source-policy-grid">${sourcePolicy.map(item => `<article class="panel source-policy-card"><span>${item.tier}</span><div><h3>${item.title}</h3><p>${item.sources}</p><small>${item.use}</small></div></article>`).join("")}</div>
     <div class="evidence-layout"><aside class="panel evidence-filter"><p class="eyebrow">证据标签</p><h2>证据类型</h2>${[["ALL","全部"],["F","[F] Formation 直接公开"],["C","[C] 案例反推"],["P","[P] 外部一级来源"],["E","[E] 扩展逻辑"]].map(([k,v]) => `<button data-filter="${k}" class="${evidenceFilter===k?"active":""}"><span>${v}</span><b>${k==="ALL"?evidence.length:evidence.filter(e=>e.tag===k).length}</b></button>`).join("")}</aside>
