@@ -470,6 +470,7 @@ const viewTitles = {
   recoverability: "STEP 1 · 海选池",
   ranking: "STEP 2 · 科学预测与投资决策",
   scenario: "STEP 3 · 假设场景与开发方案优化",
+  validation: "STEP 4 · 模型验证与校准",
   registry: "预测版本记录",
   evidence: "证据与审计"
 };
@@ -593,7 +594,8 @@ const journeyQuestions = [
   { no:"02", step:"STEP 1", title:"这个资产还有没有救？", answer:"区分科学失败、分子缺陷与可以调整的开发问题。", output:"输出：淘汰 / 待补证据 / 可救 / 深入评估", view:"recoverability" },
   { no:"03", step:"STEP 2A", title:"重新开发会不会成功？", answer:"沿着暴露、靶点结合、机制、疗效和安全性形成概率区间。", output:"输出：PoS区间 + 关键未知项", view:"ranking", section:"prediction" },
   { no:"04", step:"STEP 2B", title:"值不值得优先投入？", answer:"把成功概率、价值、时间、成本和资源约束放在一起排序。", output:"输出：资源优先级 + 行动建议", view:"ranking", section:"decision" },
-  { no:"05", step:"STEP 3", title:"入选后应该怎么调整？", answer:"比较适应症、人群、剂量、联合和试验设计等候选方案。", output:"输出：调整建议 + 下一最佳实验", view:"scenario" }
+  { no:"05", step:"STEP 3", title:"入选后应该怎么调整？", answer:"比较适应症、人群、剂量、联合和试验设计等候选方案。", output:"输出：调整建议 + 下一最佳实验", view:"scenario" },
+  { no:"06", step:"STEP 4", title:"这套模型到底准不准？", answer:"锁定规则和预测，用独立案例盲法检验，再按整批结果校准。", output:"输出：命中、误判与校准结果", view:"validation" }
 ];
 
 function disclosure(title, summary, content, open=false, className="") {
@@ -602,9 +604,9 @@ function disclosure(title, summary, content, open=false, className="") {
 
 function renderWorkspace() {
   const selected = assets.find(a => a.id === selectedAssetId) || assets[0];
-  root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答五个问题</p><h2>把复杂的资产判断，变成一条可以顺着走完的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases" class="primary-button">查看真实案例试跑</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>方向验证期</strong><p>逻辑已成型，正在用少量真实案例校准规则、权重与建议质量。</p></aside></section>
-    <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到提出行动建议</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>反馈闭环</b><span>STEP 3 形成的新开发方案会回到 STEP 2A / 2B，重新计算成功概率与资源优先级。</span></div></section>
-    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>用中国项目与海外历史回测检查这套逻辑</h2><p>两个和铂案例检验当前判断；三个海外案例分别检验安全性重构、试验设计重构和及时停止。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-real-case-entry="${item.id}"><span>中国案例 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases"><span>海外回测</span><strong>3 个历史案例</strong><small>可救、重构与淘汰</small></button></div><button data-overview-view="cases" class="primary-button">进入案例试跑</button></section>
+  root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答六个问题</p><h2>把复杂的资产判断，变成一条可以验证的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases" class="primary-button">查看真实案例试跑</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>模型验证期</strong><p>决策逻辑已成型，正在锁定规则并用独立案例检验预测能力。</p></aside></section>
+    <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到验证模型</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>双重闭环</b><span>STEP 3 把新方案回写 STEP 2；STEP 4 用真实结果检查模型，只在整批验证后统一校准。</span></div></section>
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>用中国项目与海外历史回测检查这套逻辑</h2><p>两个和铂案例检验当前判断；三个海外案例分别检验安全性重构、试验设计重构和及时停止。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-real-case-entry="${item.id}"><span>中国案例 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases"><span>海外回测</span><strong>3 个历史案例</strong><small>可救、重构与淘汰</small></button></div><div class="case-entry-actions"><button data-overview-view="cases" class="primary-button">查看案例</button><button data-overview-view="validation" class="secondary-button">查看验证结果</button></div></section>
     ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
@@ -671,10 +673,11 @@ function renderCaseStudies() {
       ${disclosure("STEP 3 · 项目应该怎么调整？", item.recommendation, `<div class="adjustment-table"><div class="adjustment-head"><span>调整杠杆</span><span>建议</span><span>模拟影响</span><span>为什么</span></div>${item.adjustments.map(row=>`<div><b>${row.lever}</b><p>${row.action}</p><strong>${row.impact}</strong><small>${row.reason}</small></div>`).join("")}</div><div class="next-action case-next"><span>下一最佳实验</span><strong>${item.nextExperiment}</strong><small>停止规则 · ${item.stopRule}</small></div>`, true)}
       ${disclosure("证据来源与边界", "每个事实回到公开来源；推断和模拟不得伪装成事实。", `<div class="source-link-list">${item.sources.map(source=>`<a href="${source.url}" target="_blank" rel="noreferrer"><span>${source.tier}</span><strong>${source.title}</strong><small>打开原始来源</small></a>`).join("")}</div><div class="evidence-boundary"><div><span class="fact-label">事实</span><p>来源中明确披露的人群、结果、阶段与权利信息。</p></div><div><span class="model-label">模型推断</span><p>海选结论、成功概率区间与证据置信度。</p></div><div><span class="scenario-label">情景建议</span><p>适应症、人群和试验调整，以及模拟概率变化。</p></div></div>`)}
     </section>
-    <section class="case-footer panel"><div><p class="eyebrow">继续检查</p><h2>把案例带入同一套预测与场景计算</h2><p>查看它如何进入PoS因果链、场景重构和下一最佳实验。</p></div><button data-case-action="prediction" class="secondary-button">打开STEP 2A预测</button><button data-case-action="scenario" class="primary-button">打开STEP 3调整</button></section>`;
+    <section class="case-footer panel"><div><p class="eyebrow">继续检查</p><h2>把案例带入同一套预测、场景与验证链</h2><p>查看它如何进入PoS因果链、场景重构和模型验证。</p></div><button data-case-action="prediction" class="secondary-button">打开STEP 2A预测</button><button data-case-action="scenario" class="secondary-button">打开STEP 3调整</button><button data-case-action="validation" class="primary-button">打开STEP 4验证</button></section>`;
   document.querySelectorAll("[data-real-case]").forEach(button=>button.addEventListener("click",()=>{selectedRealCaseId=button.dataset.realCase;renderCaseStudies();}));
   document.querySelectorAll("[data-case-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.caseView)));
   document.querySelectorAll("[data-case-action]").forEach(button=>button.addEventListener("click",()=>{
+    if (button.dataset.caseAction === "validation") { switchView("validation"); return; }
     selectedStep2Id = item.candidateId;
     if (button.dataset.caseAction === "prediction") { step2Section = "prediction"; switchView("ranking"); return; }
     step3SelectedCandidateId = item.candidateId;
@@ -682,6 +685,39 @@ function renderCaseStudies() {
     resetStep3Params();
     switchView("scenario");
   }));
+}
+
+const validationStages = [
+  { no:"01", title:"锁定模型版本", status:"已完成", statusClass:"done", rule:"固定先验、证据乘数、区间算法和30%失败门槛；验证期间不得逐例改规则。", output:`基线版本 ${historicalBacktestModel.version}` },
+  { no:"02", title:"建立独立验证集", status:"待建立", statusClass:"pending", rule:"选择没有参与规则设计的成功与失败案例，并预先写明纳入、排除和结果定义。", output:"当前3例属于说明性历史回测，不计作独立验证集" },
+  { no:"03", title:"进行盲法预测", status:"待执行", statusClass:"pending", rule:"研究者只看到证据截止日前的信息；最终结果在预测完成前保持隐藏。", output:"输出概率区间、方向、建议与关键未知项" },
+  { no:"04", title:"锁定预测结果", status:"机制已具备", statusClass:"ready", rule:"保存证据快照、截止日期、模型版本、概率区间和建议，之后只读不可覆盖。", output:"预测版本记录已经支持锁定与追溯" },
+  { no:"05", title:"揭示结果并校准", status:"内部回测完成", statusClass:"partial", rule:"整批揭示结果后统计命中、假阳性、假阴性和概率误差；只在批次结束后统一校准。", output:"3例说明性回测完成；独立验证仍待进行" }
+];
+
+function getValidationMetrics() {
+  const rows = historicalCases.map(item => ({
+    asset:item.asset.split(" / ")[0],
+    cutoff:item.evidenceCutoff.split("（")[0],
+    result:item.backtestResult,
+    actual:item.backtest.actualLabel
+  }));
+  const hits = rows.filter(row => row.result.hit).length;
+  const falsePositive = rows.filter(row => row.result.predictedSuccess && !row.result.actualSuccess).length;
+  const falseNegative = rows.filter(row => !row.result.predictedSuccess && row.result.actualSuccess).length;
+  const brier = rows.reduce((sum,row) => sum + Math.pow(row.result.point / 100 - (row.result.actualSuccess ? 1 : 0), 2), 0) / rows.length;
+  return { rows, hits, falsePositive, falseNegative, brier:brier.toFixed(2) };
+}
+
+function renderValidation() {
+  const metrics = getValidationMetrics();
+  root.innerHTML = `<div class="view-heading validation-heading"><div><p class="eyebrow">STEP 4 · Model Validation & Calibration</p><h2>先把答案锁住，再让真实结果检验模型</h2><p>这里不继续评价某个资产，而是评价模型本身。说明性回测用于检查流程；只有未参与规则设计的独立盲法案例，才能验证预测能力。</p></div><span class="draft-badge">基线模型 ${historicalBacktestModel.version}</span></div>
+    <section class="validation-hero panel"><div><span>当前验证阶段</span><strong>内部说明性回测</strong><p>流程已跑通，但尚未完成独立、盲法的外部验证。</p></div><div><span>说明性回测</span><strong>${metrics.hits} / ${metrics.rows.length}</strong><small>方向命中；不能等同模型已验证</small></div><div><span>独立验证集</span><strong>0</strong><small>下一轮必须新增，不能复用当前3例</small></div><div><span>Brier分数</span><strong>${metrics.brier}</strong><small>越低越好；当前样本过小</small></div></section>
+    <section class="validation-workflow"><div class="overview-section-head"><div><p class="eyebrow">验证闭环</p><h2>五个步骤必须按顺序完成</h2></div><span>任何一步缺失，结论都只能叫“回测”，不能叫“验证”</span></div><div class="validation-stage-grid">${validationStages.map(stage=>`<article class="panel validation-stage"><div><span>${stage.no}</span><em class="validation-status status-${stage.statusClass}">${stage.status}</em></div><h3>${stage.title}</h3><p>${stage.rule}</p><small>${stage.output}</small></article>`).join("")}</div></section>
+    <section class="panel validation-results"><div class="panel-head"><div><p class="eyebrow">当前可见结果</p><h2>3个案例方向吻合，但仍属于规则开发阶段</h2><p>失败判定规则：预测区间上限低于${historicalBacktestModel.threshold}%。</p></div><span class="draft-badge">非独立验证集</span></div><div class="table-wrap"><table><thead><tr><th>案例</th><th>证据截止</th><th>自动预测</th><th>预测方向</th><th>后来结果</th><th>回测</th></tr></thead><tbody>${metrics.rows.map(row=>`<tr><td><strong>${row.asset}</strong><small>说明性历史回测</small></td><td>${row.cutoff}</td><td><strong>${row.result.point}%</strong><small>${row.result.low}–${row.result.high}%</small></td><td>${row.result.predictedSuccess?"保留成功可能":"预测失败"}</td><td>${row.actual}</td><td><span class="validation-hit ${row.result.hit?"hit":"miss"}">${row.result.hit?"命中":"未命中"}</span></td></tr>`).join("")}</tbody></table></div><div class="validation-error-strip"><span>假阳性 <b>${metrics.falsePositive}</b></span><span>假阴性 <b>${metrics.falseNegative}</b></span><span>方向命中率 <b>${Math.round(metrics.hits / metrics.rows.length * 100)}%</b></span><em>这些数字只描述当前3例，不代表未来表现。</em></div></section>
+    ${disclosure("查看指标与防止事后偏差的规则", "为什么3/3仍不能证明模型可靠？", `<div class="validation-rule-grid"><article><span>数据截止</span><p>只允许使用截止日前已经公开、可追溯的事实；事件发生但尚未披露的信息不可使用。</p></article><article><span>版本冻结</span><p>验证期间不得因单个案例结果修改先验、乘数或阈值；任何变更都生成新版本。</p></article><article><span>批量揭盲</span><p>一批预测全部锁定后再统一揭示结果，避免看一个结果就调一次模型。</p></article><article><span>方向错误</span><p>假阳性是预测可成功但实际失败；假阴性是预测失败但实际成功，两者必须分别统计。</p></article><article><span>概率校准</span><p>Brier分数衡量概率与0/1结果的距离；还需要按概率区间比较长期实际成功频率。</p></article><article><span>模型升级</span><p>校准后的规则必须作为新版本重新接受独立验证，不能覆盖旧预测记录。</p></article></div>`)}
+    <section class="panel validation-next"><div><p class="eyebrow">下一步</p><h2>建立第一批真正独立的验证案例</h2><p>当前页面已经把流程、锁定规则和指标准备好；下一步应选择未参与v1.0设计的历史案例，隐藏结局后批量计算。</p></div><div><button data-validation-view="cases" class="secondary-button">查看说明性案例</button><button data-validation-view="registry" class="primary-button">查看锁定记录</button></div></section>`;
+  document.querySelectorAll("[data-validation-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.validationView)));
 }
 
 const hardGateDefinitions = {
@@ -1388,7 +1424,7 @@ function switchView(view) {
     const sectionMatch = !btn.dataset.step2SectionTarget || btn.dataset.step2SectionTarget === step2Section;
     btn.classList.toggle("active", btn.dataset.view === view && sectionMatch);
   });
-  ({ workspace: renderWorkspace, cases: renderCaseStudies, radar: renderRadar, recoverability: renderRecoverability, ranking: renderRanking, scenario: renderScenario, registry: renderRegistry, evidence: renderEvidence })[view]();
+  ({ workspace: renderWorkspace, cases: renderCaseStudies, radar: renderRadar, recoverability: renderRecoverability, ranking: renderRanking, scenario: renderScenario, validation: renderValidation, registry: renderRegistry, evidence: renderEvidence })[view]();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -1410,7 +1446,7 @@ function registerAgentTools() {
   register({
     name: "navigate_decision_view",
     title: "切换决策视图",
-    description: "切换到决策总览、海选池、优先级排序、假设场景实验室或证据审计视图。",
+    description: "切换到决策总览、海选池、优先级排序、假设场景、模型验证、预测记录或证据审计视图。",
     inputSchema: { type: "object", properties: { view: { type: "string", enum: Object.keys(viewTitles) } }, required: ["view"], additionalProperties: false },
     annotations: { readOnlyHint: false, untrustedContentHint: false },
     execute(input) {
