@@ -70,11 +70,26 @@ const historicalBacktestModel = {
   }
 };
 
-function calculateHistoricalBacktest(input) {
-  const prior = historicalBacktestModel.priors[input.stage] ?? 50;
+const postResultCalibrationModel = {
+  version: "v1.1-candidate-post-result",
+  threshold: 30,
+  priors: { "Phase 3": 55 },
+  factors: {
+    ROBUST_PHASE2_SIGNAL: { label:"随机Ⅱ期阳性，但按效应稳健性折减", dimension:"Phase 2 robustness", multiplier:1.45, rationale:"保留人体疗效信息，同时降低临界显著、单项研究被过度外推的影响。" },
+    CLASS_MOA_SUPPORT: { label:"机制与同类路径提供有限支持", dimension:"Target / MoA", multiplier:1.10, rationale:"同类先例主要支持资产可开发性，不能代替该分子在当前终点上的确认性疗效。" },
+    SAFETY_CONTINUATION_ONLY: { label:"安全性支持继续开发，但不等同疗效", dimension:"Safety eligibility", multiplier:1.05, rationale:"安全窗决定能否继续研究，对主要疗效终点仅给予很小加分。" },
+    NO_INDEPENDENT_REPLICATION: { label:"缺少独立重复验证", dimension:"Independent replication", multiplier:0.60, rationale:"单项Ⅱ期的效应量可能在更大样本与不同中心中回归。" },
+    PLACEBO_MEASUREMENT_VOLATILITY: { label:"安慰剂反应与测量方差较高", dimension:"Endpoint reliability", multiplier:0.60, rationale:"TAHC定位、判读与安慰剂组变化可直接削弱组间差异。" },
+    LOCAL_EXPOSURE_UNCONFIRMED: { label:"剂量—局部暴露关系未充分确认", dimension:"Dose / local exposure", multiplier:0.75, rationale:"系统安全不代表头皮局部暴露已达到稳定有效窗口。" },
+    ADHERENCE_EXECUTION_RISK: { label:"每日两次外用的依从性与执行风险", dimension:"Adherence / operations", multiplier:0.85, rationale:"用药依从性、中心执行和图像采集一致性会稀释真实药效。" }
+  }
+};
+
+function calculateWithModel(model, input) {
+  const prior = model.priors[input.stage] ?? 50;
   let odds = prior / (100 - prior);
   const trace = input.factorIds.map(id => {
-    const factor = historicalBacktestModel.factors[id];
+    const factor = model.factors[id];
     const before = Math.round((odds / (1 + odds)) * 100);
     odds *= factor.multiplier;
     const after = Math.round((odds / (1 + odds)) * 100);
@@ -84,16 +99,20 @@ function calculateHistoricalBacktest(input) {
   const width = Math.round(5 + (100 - input.confidence) * .10 + input.missing * .70 + input.conflicts * 1.50);
   const low = Math.max(1, point - width);
   const high = Math.min(95, point + width);
-  const predictedSuccess = high >= historicalBacktestModel.threshold;
+  const predictedSuccess = high >= model.threshold;
   return {
     prior, point, low, high, width, trace,
     predictedSuccess,
     predictedLabel: predictedSuccess ? "保留成功可能 / 建议重构" : "预测失败 / 建议停止",
     actualSuccess: input.actualSuccess,
     hit: predictedSuccess === input.actualSuccess,
-    threshold: historicalBacktestModel.threshold,
+    threshold: model.threshold,
     confidence: input.confidence
   };
+}
+
+function calculateHistoricalBacktest(input) {
+  return calculateWithModel(historicalBacktestModel, input);
 }
 
 const historicalCases = [
@@ -344,6 +363,17 @@ const historicalCases = [
       redesignFactorIds: [],
       modelInput: { stage:"Phase 3", confidence:63, missing:2, conflicts:2, factorIds:["RANDOMIZED_PHASE2_SIGNAL","CLASS_MOA_PRECEDENT","ACCEPTABLE_SAFETY_PROFILE","SINGLE_STUDY_REPLICATION_RISK","PLACEBO_SENSITIVE_ENDPOINT"] }
     },
+    postResultLearning: {
+      title: "这次未命中教会模型什么？",
+      modelInput: { stage:"Phase 3", confidence:63, missing:2, conflicts:2, factorIds:["ROBUST_PHASE2_SIGNAL","CLASS_MOA_SUPPORT","SAFETY_CONTINUATION_ONLY","NO_INDEPENDENT_REPLICATION","PLACEBO_MEASUREMENT_VOLATILITY","LOCAL_EXPOSURE_UNCONFIRMED","ADHERENCE_EXECUTION_RISK"] },
+      missedBecause: [
+        "v1.0对单项Ⅱ期阳性和良好安全性的加分过高。",
+        "对独立重复、安慰剂波动、测量质量与依从性的惩罚不足。",
+        "没有单独要求剂量与头皮局部暴露关系得到确认。"
+      ],
+      lesson: "资产仍可能具有可重构性，但2023年这一次确认性试验的成功率被高估；今后必须把“资产有没有救”和“下一项具体试验会不会成功”分开计算。",
+      warning: "这是看到结果后的v1.1校准示例，不是新的前瞻性预测，也不能把v1.0的未命中改写成命中。"
+    },
     knownFacts: [
       "中国男性AGAⅡ期为多中心、随机、双盲、安慰剂对照研究。",
       "公司披露0.5% BID组24周TAHC较安慰剂增加15.34根/cm²，P=0.024，达到Ⅱ期主要终点。",
@@ -378,6 +408,9 @@ historicalCases.forEach(item => {
   item.backtestResult = calculateHistoricalBacktest({ ...item.backtest.modelInput, actualSuccess:item.backtest.actualSuccess });
   item.probability = `${item.backtestResult.low}–${item.backtestResult.high}%`;
   item.confidence = item.backtestResult.confidence;
+  if (item.postResultLearning) {
+    item.postResultLearning.result = calculateWithModel(postResultCalibrationModel, { ...item.postResultLearning.modelInput, actualSuccess:item.backtest.actualSuccess });
+  }
 });
 
 function getCaseRedesignProjection(item) {
@@ -506,6 +539,7 @@ const evidence = [
   { tag: "P", asset: "呋喹替尼", claim: "证据截止日前随机对照Ⅱ期显示PFS 4.73个月对0.99个月；随后FRESCOⅢ期达到OS主要终点并在中国获批。", source: "和黄医药 / ClinicalTrials.gov / NMPA", quality: "公司、登记与监管一级来源", updated: "2026-10" },
   { tag: "P", asset: "KX-826 0.5% BID", claim: "证据截止日前中国男性AGAⅡ期达到主要终点；2023年同剂量Ⅲ期相对安慰剂未达到统计学显著性。", source: "开拓药业 / 港交所法定披露", quality: "公司与法定披露", updated: "2026-10" },
   { tag: "E", asset: "历史回测规则", claim: "模型只允许读取预设证据截止日前的信息；阶段先验赔率乘以证据修正乘数形成概率区间，后来结果只用于检验命中，不回填初始预测。", source: "v1.0-rule-backtest", quality: "模型规则", updated: "2026-10" },
+  { tag: "E", asset: "KX-826模型学习", claim: "v1.0的63%假阳性永久保留；结果揭示后的v1.1候选示例降至约32%，仅用于提出新规则，不计为回测命中。", source: "v1.1-candidate-post-result", quality: "事后校准 · 待独立验证", updated: "2026-10" },
   { tag: "F", asset: "Formation 运营模式", claim: "资产选择、开发策略与临床执行属于连续决策链。", source: "Formation 官网与公开材料", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "适应症全景分析", claim: "原始数据需标准化；同行评议文献通常优先于注册库中的结果摘要。", source: "Formation 工程博客", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "人类遗传学", claim: "遗传学分析进入每项资产评估，并保留人工检查点。", source: "Formation 遗传学工作流", quality: "一级来源", updated: "2026-10" },
@@ -803,6 +837,14 @@ function renderBacktestTrace(item) {
   return `<div class="backtest-trace-intro"><div><span>模型版本</span><strong>${historicalBacktestModel.version}</strong></div><div><span>计算公式</span><strong>后验赔率 = 阶段先验赔率 × 全部证据乘数</strong></div><div><span>判定规则</span><strong>区间上限低于 ${result.threshold}% 才预测失败</strong></div></div><div class="factor-trace-grid"><div class="factor-trace-row factor-trace-head"><span>证据维度与含义</span><span>修正乘数</span><span>修正前 → 修正后</span></div><div class="factor-trace-row"><div><span>Stage prior</span><strong>${item.backtest.modelInput.stage} 阶段先验</strong><small>第一版规则先验；后续需要用更大历史样本校准。</small></div><b class="factor-multiplier">BASE</b><em>${result.prior}%</em></div>${rows}</div><div class="backtest-trace-result"><span>自动输出</span><strong>${result.point}% · 区间 ${result.low}–${result.high}%</strong><p>${result.predictedLabel}。区间宽度同时考虑证据置信度、缺失项与冲突项。</p></div>`;
 }
 
+function renderModelLearning(item) {
+  const learning = item.postResultLearning;
+  if (!learning?.result) return "";
+  const result = learning.result;
+  const rows = result.trace.map(factor => `<div class="factor-trace-row"><div><span>${factor.dimension}</span><strong>${factor.label}</strong><small>${factor.rationale}</small></div><b class="factor-multiplier ${factor.multiplier >= 1 ? "up" : "down"}">×${factor.multiplier.toFixed(2)}</b><em>${factor.before}% → ${factor.after}%</em></div>`).join("");
+  return `<section class="panel model-learning"><div class="model-learning-head"><div><p class="eyebrow">Model learning · 结果揭示后校准</p><h2>${learning.title}</h2><p>${learning.lesson}</p></div><span class="draft-badge">候选版 · 待独立验证</span></div><div class="model-learning-grid"><article><span>v1.0 原预测 · 永久保留</span><strong>${item.backtestResult.point}%</strong><small>区间 ${item.backtestResult.low}–${item.backtestResult.high}% · 预测保留成功可能 · 实际失败</small></article><article class="miss-reasons"><span>没有命中的原因</span><ul>${learning.missedBecause.map(reason=>`<li>${reason}</li>`).join("")}</ul></article><article class="candidate-result"><span>v1.1 事后校准示例</span><strong>${result.point}%</strong><small>区间 ${result.low}–${result.high}% · 接近失败门槛，显著降低信心</small></article></div><div class="model-learning-warning"><b>边界说明</b><span>${learning.warning}</span></div>${disclosure("查看v1.1候选因子如何重算", `阶段先验 ${result.prior}% → 点估计 ${result.point}% → 区间 ${result.low}–${result.high}%`, `<div class="backtest-trace-intro"><div><span>候选模型</span><strong>${postResultCalibrationModel.version}</strong></div><div><span>计算对象</span><strong>下一项具体确认性试验成功率</strong></div><div><span>与资产可救性关系</span><strong>分开判断，不再混为一个概率</strong></div></div><div class="factor-trace-grid"><div class="factor-trace-row factor-trace-head"><span>新增或重估维度</span><span>修正乘数</span><span>修正前 → 修正后</span></div><div class="factor-trace-row"><div><span>Stage prior</span><strong>Phase 3 阶段先验</strong><small>沿用55%起点，只改变证据如何修正。</small></div><b class="factor-multiplier">BASE</b><em>${result.prior}%</em></div>${rows}</div><div class="backtest-trace-result"><span>候选输出</span><strong>${result.point}% · 区间 ${result.low}–${result.high}%</strong><p>该数值只展示规则如何吸收这次错误，不能纳入当前命中率。</p></div>`)}</section>`;
+}
+
 function renderCaseRedesignImpact(item, projection) {
   if (!projection) return "";
   const crossesFailureLine = projection.adjusted.high >= projection.threshold;
@@ -822,7 +864,7 @@ function renderCaseStudies() {
     <section class="backtest-scorecard panel"><div><span>历史回测</span><strong>${backtestHits} / ${historicalResults.length} 命中</strong><small>海外3例 + 国内2例</small></div><div><span>统一判定门槛</span><strong>区间上限 &lt; ${historicalBacktestModel.threshold}% = 预测失败</strong><small>实际失败案例落在门槛下方即计为命中</small></div><p>这是流程验证，不是模型已被证明：样本只有${historicalResults.length}个，并且当前新增案例仍是事后研究；未命中也会保留，用于暴露权重和变量缺口。</p></section>
     <div class="case-switcher" role="tablist" aria-label="选择真实案例">${realCases.map(entry=>`<button role="tab" data-real-case="${entry.id}" aria-selected="${entry.id===item.id}" class="${entry.id===item.id?"active":""}"><span>${entry.stage}</span><strong>${entry.asset}</strong><small>${entry.target}</small></button>`).join("")}</div>
     <section class="case-verdict panel"><div class="case-identity"><span class="fact-label">公开事实</span><h2>${item.asset}</h2><p>${item.modality} · ${item.target} · ${item.stage}</p><small>当前公开方向：${item.currentUse}<br>${item.rights}</small></div><div class="case-main-verdict"><span>${isBacktest ? "系统历史回测结论 · 非当时公司决定" : "系统当前判断"}</span><strong class="case-status status-${item.verdictClass}">${item.verdict}</strong><p>${item.recommendation}</p></div><div class="case-probability"><span>${isBacktest ? "自动回测区间" : "研究性预测区间"}</span><strong>${item.probability}</strong><small>${item.probabilityLabel}</small><i><b style="width:${item.confidence}%"></b></i><em>证据置信度 ${item.confidence}%${isBacktest ? ` · 点估计 ${item.backtestResult.point}%` : ""}</em></div></section>
-    ${item.backtest ? `<section class="case-backtest panel"><div><span>模型可见信息截止</span><strong>${item.evidenceCutoff}</strong></div><div><span>系统自动预测 · 未读取结果</span><strong>${item.backtestResult.point}% · ${item.probability}</strong><p>${item.backtestResult.predictedLabel}</p></div><div><span>当时公司实际行动</span><strong>公司事实 · 非模型结论</strong><p>${item.backtest.companyActionAtCutoff}</p></div><div><span>后来真实结果 · 不进入初始预测</span><strong>${item.backtest.outcomeDate} · ${item.backtest.actualLabel}</strong><p>${item.backtest.outcome}</p></div><div class="${item.backtestResult.hit ? "backtest-hit" : "backtest-miss"}"><span>回测判定</span><strong>${item.backtestResult.hit ? "命中" : "未命中"}</strong><p>${item.backtestResult.predictedSuccess ? "预测保留成功可能" : "预测失败"}</p></div></section>${disclosure("查看自动计算过程", `阶段先验 ${item.backtestResult.prior}% → 点估计 ${item.backtestResult.point}% → 区间 ${item.probability}`, renderBacktestTrace(item))}` : ""}
+    ${item.backtest ? `<section class="case-backtest panel"><div><span>模型可见信息截止</span><strong>${item.evidenceCutoff}</strong></div><div><span>系统自动预测 · 未读取结果</span><strong>${item.backtestResult.point}% · ${item.probability}</strong><p>${item.backtestResult.predictedLabel}</p></div><div><span>当时公司实际行动</span><strong>公司事实 · 非模型结论</strong><p>${item.backtest.companyActionAtCutoff}</p></div><div><span>后来真实结果 · 不进入初始预测</span><strong>${item.backtest.outcomeDate} · ${item.backtest.actualLabel}</strong><p>${item.backtest.outcome}</p></div><div class="${item.backtestResult.hit ? "backtest-hit" : "backtest-miss"}"><span>回测判定</span><strong>${item.backtestResult.hit ? "命中" : "未命中"}</strong><p>${item.backtestResult.predictedSuccess ? "预测保留成功可能" : "预测失败"}</p></div></section>${disclosure("查看自动计算过程", `阶段先验 ${item.backtestResult.prior}% → 点估计 ${item.backtestResult.point}% → 区间 ${item.probability}`, renderBacktestTrace(item))}${renderModelLearning(item)}` : ""}
     <section class="case-question panel"><span>这个案例真正要回答的问题</span><h2>${item.question}</h2><p>系统不会把“有信号”直接等同于“会成功”，而是继续寻找可以改变结论的开发变量。</p></section>
     <section class="case-path"><div class="overview-section-head"><div><p class="eyebrow">案例如何走过系统</p><h2>先判断资格，再提出调整</h2></div><span>点击展开每一步依据</span></div>
       ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", item.step1Summary || `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">关键支持证据</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
@@ -868,11 +910,13 @@ function getValidationMetrics() {
 
 function renderValidation() {
   const metrics = getValidationMetrics();
+  const kxLearning = historicalCases.find(item=>item.id==="KX826-CN-2023").postResultLearning.result;
   root.innerHTML = `<div class="view-heading validation-heading"><div><p class="eyebrow">STEP 4 · Model Validation & Calibration</p><h2>先把答案锁住，再让真实结果检验模型</h2><p>这里不继续评价某个资产，而是评价模型本身。说明性回测用于检查流程；只有未参与规则设计的独立盲法案例，才能验证预测能力。</p></div><span class="draft-badge">基线模型 ${historicalBacktestModel.version}</span></div>
     <section class="validation-hero panel"><div><span>当前验证阶段</span><strong>内部说明性回测</strong><p>流程已跑通，但尚未完成独立、盲法的外部验证。</p></div><div><span>说明性回测</span><strong>${metrics.hits} / ${metrics.rows.length}</strong><small>方向命中；不能等同模型已验证</small></div><div><span>独立验证集</span><strong>0</strong><small>下一轮必须新增，不能复用当前${metrics.rows.length}例</small></div><div><span>Brier分数</span><strong>${metrics.brier}</strong><small>越低越好；当前样本过小</small></div></section>
     <section class="validation-workflow"><div class="overview-section-head"><div><p class="eyebrow">验证闭环</p><h2>五个步骤必须按顺序完成</h2></div><span>任何一步缺失，结论都只能叫“回测”，不能叫“验证”</span></div><div class="validation-stage-grid">${validationStages.map(stage=>`<article class="panel validation-stage"><div><span>${stage.no}</span><em class="validation-status status-${stage.statusClass}">${stage.status}</em></div><h3>${stage.title}</h3><p>${stage.rule}</p><small>${stage.output}</small></article>`).join("")}</div></section>
     <section class="panel validation-results"><div class="panel-head"><div><p class="eyebrow">当前可见结果</p><h2>${metrics.rows.length}个案例中${metrics.hits}个方向吻合，错误同样保留</h2><p>失败判定规则：预测区间上限低于${historicalBacktestModel.threshold}%。</p></div><span class="draft-badge">非独立验证集</span></div><div class="table-wrap"><table><thead><tr><th>案例</th><th>证据截止</th><th>自动预测</th><th>预测方向</th><th>后来结果</th><th>回测</th></tr></thead><tbody>${metrics.rows.map(row=>`<tr><td><strong>${row.asset}</strong><small>说明性历史回测</small></td><td>${row.cutoff}</td><td><strong>${row.result.point}%</strong><small>${row.result.low}–${row.result.high}%</small></td><td>${row.result.predictedSuccess?"保留成功可能":"预测失败"}</td><td>${row.actual}</td><td><span class="validation-hit ${row.result.hit?"hit":"miss"}">${row.result.hit?"命中":"未命中"}</span></td></tr>`).join("")}</tbody></table></div><div class="validation-error-strip"><span>假阳性 <b>${metrics.falsePositive}</b></span><span>假阴性 <b>${metrics.falseNegative}</b></span><span>方向命中率 <b>${Math.round(metrics.hits / metrics.rows.length * 100)}%</b></span><em>这些数字只描述当前${metrics.rows.length}例，不代表未来表现。</em></div></section>
     ${disclosure("查看指标与防止事后偏差的规则", `为什么${metrics.hits}/${metrics.rows.length}仍不能证明模型可靠？`, `<div class="validation-rule-grid"><article><span>数据截止</span><p>只允许使用截止日前已经公开、可追溯的事实；事件发生但尚未披露的信息不可使用。</p></article><article><span>版本冻结</span><p>验证期间不得因单个案例结果修改先验、乘数或阈值；任何变更都生成新版本。</p></article><article><span>批量揭盲</span><p>一批预测全部锁定后再统一揭示结果，避免看一个结果就调一次模型。</p></article><article><span>方向错误</span><p>假阳性是预测可成功但实际失败；假阴性是预测失败但实际成功，两者必须分别统计。</p></article><article><span>概率校准</span><p>Brier分数衡量概率与0/1结果的距离；还需要按概率区间比较长期实际成功频率。</p></article><article><span>模型升级</span><p>校准后的规则必须作为新版本重新接受独立验证，不能覆盖旧预测记录。</p></article></div>`)}
+    <section class="panel calibration-candidate"><div class="panel-head"><div><p class="eyebrow">v1.1 candidate · 模型学习</p><h2>旧答案不覆盖，新规则另起版本</h2><p>KX-826的63%仍作为v1.0假阳性保留；下面只是把错误转成下一版可检验的规则。</p></div><span class="draft-badge">待独立验证</span></div><div class="calibration-compare"><article><span>v1.0 锁定记录</span><strong>63%</strong><small>50–76% · 未命中 · 继续计入4/5和Brier 0.17</small></article><i>→</i><article><span>v1.1 事后校准示例</span><strong>${kxLearning.point}%</strong><small>${kxLearning.low}–${kxLearning.high}% · 不计入命中率</small></article></div><div class="calibration-change-grid"><article><b>降低正向加分</b><p>Ⅱ期阳性 ×1.80→×1.45；同类机制 ×1.20→×1.10；安全性 ×1.25→×1.05。</p></article><article><b>加强重复性惩罚</b><p>无独立重复 ×0.60；安慰剂与测量波动 ×0.60。</p></article><article><b>补齐原来缺失变量</b><p>剂量—局部暴露 ×0.75；依从性与执行风险 ×0.85。</p></article><article><b>分开两个问题</b><p>“资产是否可救”与“下一项具体试验是否成功”分别输出，不再共用一个概率。</p></article></div><div class="model-learning-warning"><b>验证要求</b><span>${postResultCalibrationModel.version}只能在新的、未参与调参的独立案例上验证；通过前不能替代v1.0。</span></div></section>
     <section class="panel validation-next"><div><p class="eyebrow">本轮学到什么</p><h2>未命中的国内失败案例，指出了下一轮要补的变量</h2><p>KX-826 0.5% BID提示：随机Ⅱ期阳性仍可能在Ⅲ期被安慰剂效应、测量方差、依从性和效应量回归击穿。下一版应先增加这些变量，再建立真正独立的验证集。</p></div><div><button data-validation-view="cases" class="secondary-button">查看说明性案例</button><button data-validation-view="registry" class="primary-button">查看锁定记录</button></div></section>`;
   document.querySelectorAll("[data-validation-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.validationView)));
 }
@@ -1121,6 +1165,7 @@ const step2Dimensions = [
 PK 特征|直接计算 + 规则|PoS / 时间|[F][I][E]|结构确认 / 拟议
 PD / 靶点结合|直接计算 + 模型|PoS|[F][I][E]|结构确认 / 拟议
 暴露覆盖|直接计算|PoS|[E][I]|拟议
+剂量—局部组织暴露确认|直接计算 + 规则|PoS / 剂量选择|[F][I][E]|模型学习新增 / 拟议
 安全窗|直接计算 + 规则|PoS / Gate|[F][I][E]|结构确认 / 拟议
 组织 / CNS 穿透|直接计算 + 规则|PoS|[C][F][I]|案例反推 / 结构确认
 剂型或特殊属性优势|规则 + 模型|价值 / PoS|[C][E]|案例反推 / 拟议
@@ -1128,10 +1173,13 @@ PD / 靶点结合|直接计算 + 模型|PoS|[F][I][E]|结构确认 / 拟议
   { id: "clinical", number: 3, name: "临床证据与成功概率", question: "现有人体证据支持到什么程度？", metrics: parseStep2Metrics(`
 开发阶段|规则|PoS|[F]|结构确认
 疗效信号|直接计算|PoS|[F][I]|结构确认
+Ⅱ期效应稳健性|统计模型 + 规则|PoS / 区间|[F][I][E]|模型学习新增 / 拟议
+独立重复验证|规则 + 直接计算|PoS / 不确定性|[F][I][E]|模型学习新增 / 拟议
 剂量 / 暴露反应|直接计算 + 模型|PoS|[F][I]|结构确认
 生物标志物反应|直接计算 + 规则|PoS|[F][I][E]|结构确认 / 拟议
 持续性与一致性|直接计算 + 规则|PoS|[F][I]|结构确认
 安全性与耐受性|直接计算 + 规则|PoS / Gate|[F][I]|结构确认
+安全继续资格与疗效概率分离|规则|Gate / PoS|[F][E]|模型学习新增 / 拟议
 主要终点 PoS|预测模型|PoS / 区间|[F]|结构确认
 因果链 PoTS|预测模型|PoS / 节点概率|[F]|结构确认`) },
   { id: "market", number: 4, name: "未来市场与竞争价值", question: "预计上市时还有多大可获得价值？", metrics: parseStep2Metrics(`
@@ -1149,6 +1197,9 @@ Pareto 前沿|直接计算 + 模型|价值|[F]|结构确认
 患者可获得性|直接计算 + 预测|时间|[F][I][E]|结构确认 / 拟议
 中心与地区|直接计算 + 规则|时间 / 成本|[F][I][E]|结构确认 / 拟议
 终点可行性|规则|PoS / 时间|[F][I]|结构确认
+安慰剂反应波动与终点可靠性|统计模型 + 规则|PoS / 不确定性|[F][I][E]|模型学习新增 / 拟议
+测量误差与中央判读质量|直接计算 + 规则|PoS / 不确定性|[F][I][E]|模型学习新增 / 拟议
+依从性与执行质量|直接计算 + 预测|PoS / 时间|[F][I][E]|模型学习新增 / 拟议
 试验复杂度|规则 + 直接计算|时间 / 成本|[I][E]|拟议
 监管路径|规则 + 专家判断|时间 / PoS|[F][I]|结构确认
 开发时间线|直接计算 + 预测|时间|[F][I][E]|结构确认 / 拟议
@@ -1207,8 +1258,11 @@ const step2Formulae = [
   ["拐点价值创造", "（拐点后预期价值 - 当前价值）÷ 到拐点资本", "结构确认 / 拟议"],
   ["上市时预期差异化", "资产画像 vs 上市时未来标准治疗（多维向量）", "拟议"],
   ["信息价值 VOI", "获得信息后的期望价值 - 当前期望价值 - 信息成本", "行业方法 / 拟议"],
-  ["排名稳定性", "情景或 Monte Carlo 中进入 Top N 的频率", "行业方法 / 拟议"]
+  ["排名稳定性", "情景或 Monte Carlo 中进入 Top N 的频率", "行业方法 / 拟议"],
+  ["确认性重复修正", "阶段先验赔率 × Ⅱ期稳健性 × 独立重复 × 终点可靠性 × 暴露确认 × 执行质量", "v1.1候选 · 待独立验证"]
 ];
+
+const step2LogicCount = step2Dimensions.reduce((sum, dimension) => sum + dimension.metrics.length, 0);
 
 const step2Candidates = [
   { id:"GUSA-FOCUS", asset:"Gusacitinib", indication:"免疫炎症适应症", plan:"生物标志物富集 PoC", stage:"Phase 2", pos:46, futureValue:86, timeMonths:20, cost:42, commercialLife:9.5, strategic:82, confidence:74, stability:79, missing:3, conflicts:1, gate:"通过", drivers:["人体证据与机制链相对完整","患者分层可提高信号检测效率","下一价值拐点路径清晰"], unknown:"最佳预测性 biomarker 与长期安全窗仍需确认。", template:"Phase 2：临床信号、剂量、患者选择优先" },
@@ -1284,7 +1338,7 @@ function renderStep2Detail(item) {
 
 function renderLogicDictionary() {
   const dimension = step2Dimensions.find(item => item.id === selectedDimensionId) || step2Dimensions[0];
-  return disclosure("查看完整计算逻辑", "9个一级维度、73条二级逻辑和核心公式；默认收起，不影响主结论阅读。", `<section class="logic-dictionary"><div class="logic-heading"><div><p class="eyebrow">完整逻辑覆盖</p><h2>9 个维度组织知识，73 条二级逻辑进入计算层</h2><p>九个维度不会直接相加；底层证据先转成 PoS、价值、时间、成本、商业寿命、战略价值和不确定性，再进入 Gate、价值模型和资源配置。</p></div><div class="logic-type-strip"><span><b>直接计算</b>数字、日期与 benchmark</span><span><b>规则引擎</b>阈值、Gate 与分层</span><span><b>预测模型</b>PoS、市场、入组与未来 SOC</span><span><b>专家判断</b>无法可靠形式化的事项</span></div></div><div class="dimension-grid">${step2Dimensions.map(item => `<button data-step2-dimension="${item.id}" class="dimension-card ${item.id===selectedDimensionId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.metrics.length} 条逻辑</small></button>`).join("")}</div><div class="dimension-detail panel"><div class="dimension-detail-head"><div><p class="eyebrow">维度 ${dimension.number}</p><h2>${dimension.name}</h2><p>${dimension.question}</p></div><span>${dimension.metrics.length} / ${dimension.metrics.length} 已纳入</span></div><div class="table-wrap"><table class="logic-table"><thead><tr><th>二级维度</th><th>处理方式</th><th>影响的核心变量</th><th>来源</th><th>公式状态</th></tr></thead><tbody>${dimension.metrics.map(metric => `<tr><td><strong>${metric.name}</strong></td><td>${metric.logic}</td><td>${metric.core}</td><td>${metric.origin}</td><td>${metric.status}</td></tr>`).join("")}</tbody></table></div></div><details class="panel formula-library"><summary><span><b>核心公式与结构式</b><small>共 ${step2Formulae.length} 条；明确区分行业方法与拟议公式</small></span><em>展开查看</em></summary><div class="formula-grid">${step2Formulae.map(([name,formula,status])=>`<article><b>${name}</b><code>${formula}</code><small>${status}</small></article>`).join("")}</div></details></section>`);
+  return disclosure("查看完整计算逻辑", `9个一级维度、${step2LogicCount}条二级逻辑和核心公式；默认收起，不影响主结论阅读。`, `<section class="logic-dictionary"><div class="logic-heading"><div><p class="eyebrow">完整逻辑覆盖</p><h2>9 个维度组织知识，${step2LogicCount} 条二级逻辑进入计算层</h2><p>九个维度不会直接相加；底层证据先转成 PoS、价值、时间、成本、商业寿命、战略价值和不确定性，再进入 Gate、价值模型和资源配置。</p></div><div class="logic-type-strip"><span><b>直接计算</b>数字、日期与 benchmark</span><span><b>规则引擎</b>阈值、Gate 与分层</span><span><b>预测模型</b>PoS、市场、入组与未来 SOC</span><span><b>专家判断</b>无法可靠形式化的事项</span></div></div><div class="dimension-grid">${step2Dimensions.map(item => `<button data-step2-dimension="${item.id}" class="dimension-card ${item.id===selectedDimensionId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.metrics.length} 条逻辑</small></button>`).join("")}</div><div class="dimension-detail panel"><div class="dimension-detail-head"><div><p class="eyebrow">维度 ${dimension.number}</p><h2>${dimension.name}</h2><p>${dimension.question}</p></div><span>${dimension.metrics.length} / ${dimension.metrics.length} 已纳入</span></div><div class="table-wrap"><table class="logic-table"><thead><tr><th>二级维度</th><th>处理方式</th><th>影响的核心变量</th><th>来源</th><th>公式状态</th></tr></thead><tbody>${dimension.metrics.map(metric => `<tr><td><strong>${metric.name}</strong></td><td>${metric.logic}</td><td>${metric.core}</td><td>${metric.origin}</td><td>${metric.status}</td></tr>`).join("")}</tbody></table></div></div><details class="panel formula-library"><summary><span><b>核心公式与结构式</b><small>共 ${step2Formulae.length} 条；明确区分行业方法与拟议公式</small></span><em>展开查看</em></summary><div class="formula-grid">${step2Formulae.map(([name,formula,status])=>`<article><b>${name}</b><code>${formula}</code><small>${status}</small></article>`).join("")}</div></details></section>`);
 }
 
 const stagePredictionTemplates = {
@@ -1356,7 +1410,7 @@ function renderRanking() {
     wireStep2Shared();
     return;
   }
-  root.innerHTML = `${heading}<div class="step2-controls"><label><span>资源情景</span><select id="step2-profile" class="select-box">${Object.entries(step2Profiles).map(([key,item])=>`<option value="${key}" ${key===step2ResourceProfile?"selected":""}>${item.label}</option>`).join("")}</select></label><div class="metric-tabs">${Object.entries(step2LensLabels).map(([key,label])=>`<button data-step2-lens="${key}" class="metric-tab ${key===step2Lens?"active":""}">${label}</button>`).join("")}</div></div><div class="step2-principle"><b>不做九维简单加总</b><span>Gate → PoS / Value / Time / Cost → 战略修正 → 资源配置</span><em>置信度与不确定性独立展示</em></div><div class="summary-strip step2-summary"><div class="panel summary-card" style="--card-color:var(--teal)"><span>候选开发情景</span><strong>${calculated.length}</strong><small>来自 ${uniqueAssets} 个通过海选资产</small></div><div class="panel summary-card" style="--card-color:var(--blue)"><span>Tier 1</span><strong>${calculated.filter(item=>item.tier==="Tier 1").length}</strong><small>当前资源情景</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>逻辑覆盖</span><strong>73 / 73</strong><small>九个一级维度</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>低置信候选</span><strong>${calculated.filter(item=>item.confidence<55).length}</strong><small>优先补决定性证据</small></div></div><div class="step2-layout"><section class="panel"><div class="panel-head"><div><h2>${step2LensLabels[step2Lens]}排序</h2><p>${step2Profiles[step2ResourceProfile].note}；STEP 3 优化方案可回写并参与同表比较。</p></div><span class="draft-badge">案例化演示 · 非真实数据</span></div>${renderStep2RankingTable(calculated)}</section>${renderStep2Detail(selected)}</div>${renderLogicDictionary()}`;
+  root.innerHTML = `${heading}<div class="step2-controls"><label><span>资源情景</span><select id="step2-profile" class="select-box">${Object.entries(step2Profiles).map(([key,item])=>`<option value="${key}" ${key===step2ResourceProfile?"selected":""}>${item.label}</option>`).join("")}</select></label><div class="metric-tabs">${Object.entries(step2LensLabels).map(([key,label])=>`<button data-step2-lens="${key}" class="metric-tab ${key===step2Lens?"active":""}">${label}</button>`).join("")}</div></div><div class="step2-principle"><b>不做九维简单加总</b><span>Gate → PoS / Value / Time / Cost → 战略修正 → 资源配置</span><em>置信度与不确定性独立展示</em></div><div class="summary-strip step2-summary"><div class="panel summary-card" style="--card-color:var(--teal)"><span>候选开发情景</span><strong>${calculated.length}</strong><small>来自 ${uniqueAssets} 个通过海选资产</small></div><div class="panel summary-card" style="--card-color:var(--blue)"><span>Tier 1</span><strong>${calculated.filter(item=>item.tier==="Tier 1").length}</strong><small>当前资源情景</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>逻辑覆盖</span><strong>${step2LogicCount} / ${step2LogicCount}</strong><small>九个一级维度</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>低置信候选</span><strong>${calculated.filter(item=>item.confidence<55).length}</strong><small>优先补决定性证据</small></div></div><div class="step2-layout"><section class="panel"><div class="panel-head"><div><h2>${step2LensLabels[step2Lens]}排序</h2><p>${step2Profiles[step2ResourceProfile].note}；STEP 3 优化方案可回写并参与同表比较。</p></div><span class="draft-badge">案例化演示 · 非真实数据</span></div>${renderStep2RankingTable(calculated)}</section>${renderStep2Detail(selected)}</div>${renderLogicDictionary()}`;
   wireStep2Shared();
   document.querySelector("#step2-profile").addEventListener("change", event => { step2ResourceProfile = event.target.value; renderRanking(); });
   document.querySelectorAll("[data-step2-lens]").forEach(button => button.addEventListener("click", () => { step2Lens = button.dataset.step2Lens; renderRanking(); }));
