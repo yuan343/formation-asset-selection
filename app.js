@@ -115,6 +115,7 @@ const historicalCases = [
       outcome: "FDA批准Qfitlia；获批方案改为AT活性指导的个体化剂量，而非原固定80 mg月给药。",
       actualSuccess: true,
       actualLabel: "成功：调整剂量后获批",
+      redesignFactorIds: ["PRIOR_MITIGATION_RESUMED"],
       modelInput: { stage:"Phase 3", confidence:74, missing:3, conflicts:2, factorIds:["POSITIVE_HUMAN_EFFICACY","TARGET_ENGAGEMENT_CONFIRMED","SERIOUS_MECHANISM_SAFETY","REPEATED_SAFETY_EVENT","PRIOR_MITIGATION_RESUMED"] }
     },
     knownFacts: [
@@ -169,6 +170,7 @@ const historicalCases = [
       outcome: "FDA批准Cardamyst；后续RAPID研究采用30分钟主要终点并允许重复给药，验证了重构方向。",
       actualSuccess: true,
       actualLabel: "成功：重构试验后获批",
+      redesignFactorIds: ["DESIGN_WINDOW_MISMATCH"],
       modelInput: { stage:"Phase 3", confidence:70, missing:3, conflicts:1, factorIds:["PIVOTAL_PRIMARY_ENDPOINT_MISSED","EARLY_SIGNAL_PHARMACOLOGY_ALIGNED","ACCEPTABLE_SAFETY_PROFILE","DESIGN_WINDOW_MISMATCH","POSTHOC_DEPENDENCE"] }
     },
     knownFacts: [
@@ -221,6 +223,7 @@ const historicalCases = [
       outcome: "Merck宣布停止前驱期APECS研究；独立数据委员会认为继续试验也不太可能建立正向获益风险。",
       actualSuccess: false,
       actualLabel: "失败：前驱期Ⅲ期同样终止",
+      redesignFactorIds: ["EARLIER_STAGE_HYPOTHESIS"],
       modelInput: { stage:"Phase 3", confidence:86, missing:1, conflicts:0, factorIds:["TARGET_ENGAGEMENT_CONFIRMED","PHASE23_FUTILITY","CLINICAL_BIOMARKER_DISCONNECT","EARLIER_STAGE_HYPOTHESIS"] }
     },
     knownFacts: [
@@ -257,6 +260,26 @@ historicalCases.forEach(item => {
   item.confidence = item.backtestResult.confidence;
 });
 
+function getCaseRedesignProjection(item) {
+  if (item.redesignProjection) return item.redesignProjection;
+  const redesignFactorIds = item.backtest?.redesignFactorIds || [];
+  if (!item.backtestResult || !redesignFactorIds.length) return null;
+  const baselineInput = {
+    ...item.backtest.modelInput,
+    factorIds:item.backtest.modelInput.factorIds.filter(id => !redesignFactorIds.includes(id)),
+    actualSuccess:item.backtest.actualSuccess
+  };
+  const baseline = calculateHistoricalBacktest(baselineInput);
+  const adjusted = item.backtestResult;
+  return {
+    basis:"历史回测情景",
+    baseline:{ point:baseline.point, low:baseline.low, high:baseline.high, label:"维持原路径" },
+    adjusted:{ point:adjusted.point, low:adjusted.low, high:adjusted.high, label:"采用系统建议" },
+    delta:adjusted.point - baseline.point,
+    threshold:historicalBacktestModel.threshold
+  };
+}
+
 const historicalBacktestByCandidate = Object.fromEntries(
   historicalCases.map(item => [item.candidateId, item.backtestResult])
 );
@@ -278,6 +301,7 @@ const realCases = [
     probability: "45–60%",
     probabilityLabel: "下一阶段达到预设临床目标",
     confidence: 58,
+    redesignProjection: { basis:"研究性情景模拟", baseline:{ point:43, low:35, high:51, label:"泛人群原路径" }, adjusted:{ point:52, low:45, high:60, label:"富集人群确认方案" }, delta:9, threshold:30 },
     evidenceCutoff: "2026-10-05",
     knownFacts: [
       "公开Ⅱ期队列纳入24名经过至少两线治疗的无肝转移MSS转移性结直肠癌患者。",
@@ -320,6 +344,7 @@ const realCases = [
     probability: "30–45%",
     probabilityLabel: "下一阶段观察到可确认疗效信号",
     confidence: 39,
+    redesignProjection: { basis:"研究性情景模拟", baseline:{ point:30, low:22, high:38, label:"泛实体瘤扩展" }, adjusted:{ point:38, low:30, high:45, label:"HHLA2富集扩展" }, delta:8, threshold:30 },
     evidenceCutoff: "2026-10-05",
     knownFacts: [
       "公开Ⅰ期剂量递增研究评估安全性、PK/PD和初步抗肿瘤活性。",
@@ -656,8 +681,18 @@ function renderBacktestTrace(item) {
   return `<div class="backtest-trace-intro"><div><span>模型版本</span><strong>${historicalBacktestModel.version}</strong></div><div><span>计算公式</span><strong>后验赔率 = 阶段先验赔率 × 全部证据乘数</strong></div><div><span>判定规则</span><strong>区间上限低于 ${result.threshold}% 才预测失败</strong></div></div><div class="factor-trace-grid"><div class="factor-trace-row factor-trace-head"><span>证据维度与含义</span><span>修正乘数</span><span>修正前 → 修正后</span></div><div class="factor-trace-row"><div><span>Stage prior</span><strong>${item.backtest.modelInput.stage} 阶段先验</strong><small>第一版规则先验；后续需要用更大历史样本校准。</small></div><b class="factor-multiplier">BASE</b><em>${result.prior}%</em></div>${rows}</div><div class="backtest-trace-result"><span>自动输出</span><strong>${result.point}% · 区间 ${result.low}–${result.high}%</strong><p>${result.predictedLabel}。区间宽度同时考虑证据置信度、缺失项与冲突项。</p></div>`;
 }
 
+function renderCaseRedesignImpact(item, projection) {
+  if (!projection) return "";
+  const crossesFailureLine = projection.adjusted.high >= projection.threshold;
+  const conclusion = crossesFailureLine
+    ? `系统估计调整后点概率提高 ${projection.delta >= 0 ? "+" : ""}${projection.delta}pp，并保留跨越失败门槛的可能性；这不是成功保证，仍需下一项实验验证。`
+    : `调整后仅提高 ${projection.delta >= 0 ? "+" : ""}${projection.delta}pp，整个区间仍低于 ${projection.threshold}% 失败门槛，因此系统仍建议停止。`;
+  return `<div class="case-redesign-impact"><div><span>调整前 · ${projection.baseline.label}</span><strong>${projection.baseline.point}%</strong><small>区间 ${projection.baseline.low}–${projection.baseline.high}%</small></div><i><b>${projection.delta >= 0 ? "+" : ""}${projection.delta}pp</b><span>重新计算</span></i><div class="adjusted"><span>调整后 · ${projection.adjusted.label}</span><strong>${projection.adjusted.point}%</strong><small>区间 ${projection.adjusted.low}–${projection.adjusted.high}%</small></div><p><b>${projection.basis}</b>${conclusion}</p></div>`;
+}
+
 function renderCaseStudies() {
   const item = realCases.find(entry => entry.id === selectedRealCaseId) || realCases[0];
+  const redesignProjection = getCaseRedesignProjection(item);
   const historicalResults = historicalCases.map(entry => entry.backtestResult);
   const backtestHits = historicalResults.filter(result => result.hit).length;
   const isBacktest = Boolean(item.backtestResult);
@@ -670,7 +705,7 @@ function renderCaseStudies() {
     <section class="case-path"><div class="overview-section-head"><div><p class="eyebrow">案例如何走过系统</p><h2>先判断资格，再提出调整</h2></div><span>点击展开每一步依据</span></div>
       ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", item.step1Summary || `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">关键支持证据</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
       ${disclosure("STEP 2A · 重新开发成功的可能性有多大？", `${item.probability}，置信度${item.confidence}%；这是下一阶段里程碑概率，不是最终上市概率。`, `<div class="case-calculation"><div><span>阶段先验</span><p>按${item.stage}和相应适应症设定基础区间。</p></div><i></i><div><span>证据修正</span><p>人体疗效、安全、机制一致性与样本质量向上或向下修正。</p></div><i></i><div><span>不确定性收缩</span><p>样本量、对照、缺失和冲突决定区间宽度与置信度。</p></div></div><div class="formula-note"><strong>当前输出</strong><span>${item.probabilityLabel}：${item.probability}。${isBacktest ? `本案例由 ${historicalBacktestModel.version} 自动计算；可在上方展开查看每一项修正。` : "面向未来的数值仍是研究性预测，需要在结果公布后回测。"}</span></div>`)}
-      ${disclosure("STEP 3 · 项目应该怎么调整？", item.recommendation, `<div class="adjustment-table"><div class="adjustment-head"><span>调整杠杆</span><span>建议</span><span>模拟影响</span><span>为什么</span></div>${item.adjustments.map(row=>`<div><b>${row.lever}</b><p>${row.action}</p><strong>${row.impact}</strong><small>${row.reason}</small></div>`).join("")}</div><div class="next-action case-next"><span>下一最佳实验</span><strong>${item.nextExperiment}</strong><small>停止规则 · ${item.stopRule}</small></div>`, true)}
+      ${disclosure("STEP 3 · 项目应该怎么调整？", `${item.recommendation}${redesignProjection ? `；系统重算 ${redesignProjection.baseline.point}% → ${redesignProjection.adjusted.point}%（${redesignProjection.delta >= 0 ? "+" : ""}${redesignProjection.delta}pp）` : ""}`, `${renderCaseRedesignImpact(item, redesignProjection)}<div class="adjustment-table"><div class="adjustment-head"><span>调整杠杆</span><span>建议</span><span>单项模拟影响（不可相加）</span><span>为什么</span></div>${item.adjustments.map(row=>`<div><b>${row.lever}</b><p>${row.action}</p><strong>${row.impact}</strong><small>${row.reason}</small></div>`).join("")}</div><div class="next-action case-next"><span>下一最佳实验</span><strong>${item.nextExperiment}</strong><small>停止规则 · ${item.stopRule}</small></div>`, true)}
       ${disclosure("证据来源与边界", "每个事实回到公开来源；推断和模拟不得伪装成事实。", `<div class="source-link-list">${item.sources.map(source=>`<a href="${source.url}" target="_blank" rel="noreferrer"><span>${source.tier}</span><strong>${source.title}</strong><small>打开原始来源</small></a>`).join("")}</div><div class="evidence-boundary"><div><span class="fact-label">事实</span><p>来源中明确披露的人群、结果、阶段与权利信息。</p></div><div><span class="model-label">模型推断</span><p>海选结论、成功概率区间与证据置信度。</p></div><div><span class="scenario-label">情景建议</span><p>适应症、人群和试验调整，以及模拟概率变化。</p></div></div>`)}
     </section>
     <section class="case-footer panel"><div><p class="eyebrow">继续检查</p><h2>把案例带入同一套预测、场景与验证链</h2><p>查看它如何进入PoS因果链、场景重构和模型验证。</p></div><button data-case-action="prediction" class="secondary-button">打开STEP 2A预测</button><button data-case-action="scenario" class="secondary-button">打开STEP 3调整</button><button data-case-action="validation" class="primary-button">打开STEP 4验证</button></section>`;
@@ -1311,10 +1346,29 @@ function step3ScenarioCard(scenario, baseline, tags) {
   return `<button class="scenario-option ${scenario.id===selectedStep3ScenarioId?"selected":""} ${scenario.pareto?"pareto":""}" data-step3-scenario="${scenario.id}"><div class="scenario-option-top"><span>${scenario.type}</span><div>${scenario.pareto?'<b>Pareto</b>':''}${(tags[scenario.id]||[]).map(tag=>`<em>${tag}</em>`).join("")}</div></div><h3>${scenario.name}</h3><p>${scenario.summary}</p><div class="scenario-kpis"><span>PoS <b>${scenario.pos}%</b><small>${delta(scenario.pos,baseline.pos,"pp")}</small></span><span>价值 <b>${scenario.futureValue}</b><small>${delta(scenario.futureValue,baseline.futureValue)}</small></span><span>时间 <b>${scenario.timeMonths}月</b><small>${delta(scenario.timeMonths,baseline.timeMonths,"月")}</small></span><span>成本 <b>${scenario.cost}M</b><small>${delta(scenario.cost,baseline.cost,"M")}</small></span></div></button>`;
 }
 
+function step3ModuleDetailMarkup(module) {
+  return `<div><p class="eyebrow">模块 ${module.number}</p><h2>${module.name}</h2><p>${module.question}</p></div><div class="module-method"><span>${module.method}</span><code>${module.formula}</code></div><div class="module-dimensions">${module.dimensions.map(name=>`<span>${name}</span>`).join("")}</div>`;
+}
+
 function renderStep3ModuleCoverage() {
   const module = step3Modules.find(item => item.id === selectedStep3ModuleId) || step3Modules[0];
   const total = step3Modules.reduce((sum,item)=>sum+item.dimensions.length,0);
-  return disclosure("查看全部项目调整逻辑", `9个重构模块、${total}个二级维度；默认只展示当前推荐方案。`, `<section class="step3-modules"><div class="logic-heading"><div><p class="eyebrow">STEP 3 计算维度</p><h2>9 个重构模块，${total} 个二级维度</h2><p>模块不是直接相加，而是改变 Scenario 参数并重新计算 PoS、价值、时间、成本、商业寿命和不确定性。</p></div><div class="step3-loop"><b>STEP 2A 基础排序</b><span>快速重构</span><b>STEP 2B 动态重排</b><span>深度优化</span><b>最终决策</b></div></div><div class="dimension-grid step3-module-grid">${step3Modules.map(item=>`<button data-step3-module="${item.id}" class="dimension-card ${item.id===selectedStep3ModuleId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.dimensions.length} 个维度</small></button>`).join("")}</div><div class="panel step3-module-detail"><div><p class="eyebrow">模块 ${module.number}</p><h2>${module.name}</h2><p>${module.question}</p></div><div class="module-method"><span>${module.method}</span><code>${module.formula}</code></div><div class="module-dimensions">${module.dimensions.map(name=>`<span>${name}</span>`).join("")}</div></div></section>`);
+  return disclosure("查看全部项目调整逻辑", `9个重构模块、${total}个二级维度；默认只展示当前推荐方案。`, `<section class="step3-modules"><div class="logic-heading"><div><p class="eyebrow">STEP 3 计算维度</p><h2>9 个重构模块，${total} 个二级维度</h2><p>模块不是直接相加，而是改变 Scenario 参数并重新计算 PoS、价值、时间、成本、商业寿命和不确定性。</p></div><div class="step3-loop"><b>STEP 2A 基础排序</b><span>快速重构</span><b>STEP 2B 动态重排</b><span>深度优化</span><b>最终决策</b></div></div><div class="dimension-grid step3-module-grid">${step3Modules.map(item=>`<button type="button" aria-pressed="${item.id===selectedStep3ModuleId}" data-step3-module="${item.id}" class="dimension-card ${item.id===selectedStep3ModuleId?"active":""}"><span>0${item.number}</span><b>${item.name}</b><small>${item.dimensions.length} 个维度</small></button>`).join("")}</div><div class="panel step3-module-detail" aria-live="polite">${step3ModuleDetailMarkup(module)}</div></section>`);
+}
+
+function selectStep3Module(moduleId) {
+  const module = step3Modules.find(item => item.id === moduleId);
+  const detail = document.querySelector(".step3-module-detail");
+  if (!module || !detail) return;
+  selectedStep3ModuleId = module.id;
+  document.querySelectorAll("[data-step3-module]").forEach(button => {
+    const active = button.dataset.step3Module === module.id;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  detail.innerHTML = step3ModuleDetailMarkup(module);
+  detail.classList.remove("detail-refreshed");
+  requestAnimationFrame(() => detail.classList.add("detail-refreshed"));
 }
 
 function nextBestExperiment(candidate, scenario) {
@@ -1353,7 +1407,7 @@ function wireStep3(candidate, scenarios, selected, writebackId) {
     input.addEventListener("change",()=>renderScenario());
   });
   document.querySelectorAll("[data-step3-scenario]").forEach(button=>button.addEventListener("click",()=>{ selectedStep3ScenarioId=button.dataset.step3Scenario; renderScenario(); }));
-  document.querySelectorAll("[data-step3-module]").forEach(button=>button.addEventListener("click",()=>{ selectedStep3ModuleId=button.dataset.step3Module; renderScenario(); }));
+  document.querySelectorAll("[data-step3-module]").forEach(button=>button.addEventListener("click",()=>selectStep3Module(button.dataset.step3Module)));
   document.querySelectorAll("[data-view-step2]").forEach(button=>button.addEventListener("click",()=>switchView("ranking")));
   const writeback = document.querySelector("#step3-writeback");
   if (writeback) writeback.addEventListener("click",()=>{
