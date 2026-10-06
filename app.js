@@ -60,7 +60,13 @@ const historicalBacktestModel = {
     POSTHOC_DEPENDENCE: { label:"关键正向信号依赖事后分析", dimension:"Evidence quality", multiplier:0.70, rationale:"事后切片可能高估真实效应，需要独立复制。" },
     PHASE23_FUTILITY: { label:"大型中晚期研究因无效终止", dimension:"Clinical futility", multiplier:0.25, rationale:"高质量人体证据显示获得临床获益的机会很低。" },
     CLINICAL_BIOMARKER_DISCONNECT: { label:"靶点调控未转化为临床获益", dimension:"Causal chain", multiplier:0.35, rationale:"机制链在生物标志物到患者获益之间断裂。" },
-    EARLIER_STAGE_HYPOTHESIS: { label:"更早疾病阶段仍有剩余假设", dimension:"Patient / stage", multiplier:1.20, rationale:"保留有限的阶段前移可能性，但不足以覆盖强负向证据。" }
+    EARLIER_STAGE_HYPOTHESIS: { label:"更早疾病阶段仍有剩余假设", dimension:"Patient / stage", multiplier:1.20, rationale:"保留有限的阶段前移可能性，但不足以覆盖强负向证据。" },
+    RANDOMIZED_PHASE2_SIGNAL: { label:"随机对照Ⅱ期达到主要终点", dimension:"Human efficacy", multiplier:1.80, rationale:"对照研究中的人体疗效信号显著提高下一阶段成功可能。" },
+    CLASS_MOA_PRECEDENT: { label:"机制与同类临床路径已有先例", dimension:"Target / MoA", multiplier:1.20, rationale:"同类机制已有临床验证，降低基础生物学完全失效风险。" },
+    EFFECT_RELEVANT_TO_PIVOTAL: { label:"Ⅱ期效应与Ⅲ期临床问题基本一致", dimension:"Endpoint alignment", multiplier:1.25, rationale:"相近人群、治疗线次和终点方向提高信号可迁移性。" },
+    IMMATURE_OR_UNCERTAIN_SURVIVAL: { label:"生存获益或长期效应仍不确定", dimension:"Evidence maturity", multiplier:0.85, rationale:"短期终点阳性不能完全保证确认性生存终点成功。" },
+    SINGLE_STUDY_REPLICATION_RISK: { label:"关键效应主要来自单项Ⅱ期研究", dimension:"Replication", multiplier:0.75, rationale:"单项研究中的效应量可能在更大样本中回归。" },
+    PLACEBO_SENSITIVE_ENDPOINT: { label:"终点对测量和安慰剂反应较敏感", dimension:"Endpoint robustness", multiplier:0.70, rationale:"主观体验、依从性和测量波动可能稀释组间差异。" }
   }
 };
 
@@ -111,6 +117,7 @@ const historicalCases = [
     step1Summary: "潜在可救：疗效与靶点调控仍有支持，但原固定剂量方案触发安全性硬风险，必须先重构暴露和监测。",
     backtest: {
       task: "只使用2021年修订方案公开时可获得的信息，判断重构后能否恢复开发并进入注册路径。",
+      companyActionAtCutoff: "Sanofi公布修订剂量与风险管理方案，并准备在获得监管同意后恢复临床给药。",
       outcomeDate: "2025-03-28",
       outcome: "FDA批准Qfitlia；获批方案改为AT活性指导的个体化剂量，而非原固定80 mg月给药。",
       actualSuccess: true,
@@ -166,6 +173,7 @@ const historicalCases = [
     step1Summary: "值得重构：五小时主要终点失败，但45分钟早期转复信号与快速起效药理一致，优先怀疑终点与给药设计。",
     backtest: {
       task: "在NODE-301首个Ⅲ期失败时，判断应停止开发还是重做关键试验。",
+      companyActionAtCutoff: "Milestone认为五小时终点与药理窗口不匹配，并继续与FDA讨论后续研究设计。",
       outcomeDate: "2025-12-12",
       outcome: "FDA批准Cardamyst；后续RAPID研究采用30分钟主要终点并允许重复给药，验证了重构方向。",
       actualSuccess: true,
@@ -219,6 +227,7 @@ const historicalCases = [
     step1Summary: "低潜力并接近淘汰：已有充分靶点调控，却无临床获益并伴不良事件；不能把“更早患者”当作无限续命假设。",
     backtest: {
       task: "在轻中度AD试验因无效终止后，判断前移至前驱期是否值得继续。",
+      companyActionAtCutoff: "Merck停止EPOCH，但当时仍继续前驱期阿尔茨海默病的APECS研究。",
       outcomeDate: "2018-02-13",
       outcome: "Merck宣布停止前驱期APECS研究；独立数据委员会认为继续试验也不太可能建立正向获益风险。",
       actualSuccess: false,
@@ -250,6 +259,117 @@ const historicalCases = [
       { title: "2016年人体靶点调控研究", url: "https://pubmed.ncbi.nlm.nih.gov/27807285/", tier: "截止日前论文" },
       { title: "Merck · 2018年APECS停止公告", url: "https://www.merck.com/news/merck-announces-discontinuation-of-apecs-study-evaluating-verubecestat-mk-8931-for-the-treatment-of-people-with-prodromal-alzheimers-disease/", tier: "后来真实结果" },
       { title: "NEJM · APECS前驱期AD结果", url: "https://www.nejm.org/doi/full/10.1056/NEJMoa1812840", tier: "后来同行评议" }
+    ]
+  },
+  {
+    id: "FRUQUINTINIB-CN",
+    candidateId: "FRUQUINTINIB-FRESCO",
+    asset: "呋喹替尼 / Fruquintinib",
+    target: "VEGFR1/2/3",
+    modality: "口服选择性小分子抑制剂",
+    stage: "中国案例 · Phase 3历史回测",
+    rights: "由和黄医药自主发现；中国市场由合作体系推进",
+    currentUse: "既往接受过至少二线系统治疗的转移性结直肠癌",
+    question: "随机对照Ⅱ期PFS信号能否跨越样本扩大与OS终点变化，在Ⅲ期中复制？",
+    verdict: "较高潜力 / 建议继续关键Ⅲ期",
+    verdictClass: "evaluate",
+    recommendation: "维持三线及以上mCRC的聚焦路径，以OS为核心验证Ⅱ期PFS信号，同时严格监测VEGFR相关毒性",
+    probability: "自动计算中",
+    probabilityLabel: "FRESCOⅢ期达到预设主要终点",
+    confidence: 78,
+    evidenceCutoff: "2016-08-02（历史回测）",
+    step1Summary: "值得深入评估：随机对照Ⅱ期显示强PFS信号，机制与人群基本对齐；主要未知项是小样本效应能否转化为Ⅲ期OS获益。",
+    backtest: {
+      task: "只使用2016年8月前公开的Ⅱ期与试验设计信息，预测FRESCOⅢ期能否成功。",
+      companyActionAtCutoff: "公司已完成FRESCOⅢ期入组并等待预设OS事件数成熟后揭盲。",
+      outcomeDate: "2017-03-03",
+      outcome: "FRESCO顶线结果显示OS主要终点和PFS关键次要终点均获得统计学显著改善；2018年9月在中国获批。",
+      actualSuccess: true,
+      actualLabel: "成功：Ⅲ期达到主要终点，后来获批",
+      redesignFactorIds: ["EFFECT_RELEVANT_TO_PIVOTAL"],
+      modelInput: { stage:"Phase 3", confidence:78, missing:2, conflicts:1, factorIds:["RANDOMIZED_PHASE2_SIGNAL","CLASS_MOA_PRECEDENT","ACCEPTABLE_SAFETY_PROFILE","EFFECT_RELEVANT_TO_PIVOTAL","IMMATURE_OR_UNCERTAIN_SURVIVAL"] }
+    },
+    knownFacts: [
+      "随机、双盲、安慰剂对照Ⅱ期共纳入71名既往多线治疗的mCRC患者。",
+      "截至当时公开数据，呋喹替尼组中位PFS为4.73个月，安慰剂组为0.99个月，HR 0.30，P<0.001。",
+      "安全性总体与VEGFR抑制一致，主要关注高血压和手足综合征，未公开新的不可逆分子级安全障碍。",
+      "FRESCOⅢ期沿用相近的后线mCRC人群，但主要终点升级为OS，因此仍存在终点迁移风险。"
+    ],
+    risks: [
+      "Ⅱ期样本仅71例，效应量在更大样本中可能回归。",
+      "PFS显著不保证OS一定成功，后续治疗和患者异质性可能稀释生存差异。",
+      "VEGFR相关毒性可能影响持续给药、剂量强度和净临床获益。"
+    ],
+    adjustments: [
+      { lever: "患者人群", action: "维持既往至少二线治疗失败的mCRC聚焦人群。", impact: "+5–9pp", reason: "与Ⅱ期获益人群保持一致，避免适应症泛化稀释信号。" },
+      { lever: "主要终点", action: "以OS作为确认性主要终点，并预设PFS、DCR等支持性终点。", impact: "提高证据等级", reason: "验证短期疾病控制能否转化为患者生存获益。" },
+      { lever: "暴露管理", action: "预设高血压、手足综合征的减量和停药规则。", impact: "保护剂量强度", reason: "降低已知类效应对持续治疗的影响。" },
+      { lever: "统计设计", action: "按预设死亡事件数揭盲，避免提前查看趋势。", impact: "降低偏差", reason: "确保OS结论由成熟事件驱动。" }
+    ],
+    nextExperiment: "完成随机、双盲、安慰剂对照FRESCOⅢ期，并以预设OS事件数进行最终分析",
+    stopRule: "若OS主要终点未达到统计学显著性，且PFS或净临床获益不足以形成明确替代路径，则停止当前注册方案。",
+    sources: [
+      { title: "和黄医药 · 2016年中期报告（截止日前Ⅱ期数据）", url: "https://www.hutch-med.com/wp-content/uploads/2016/08/pre160802.pdf", tier: "截止日前公司披露" },
+      { title: "和黄医药 · mCRC随机对照Ⅱ期结果", url: "https://www.hutch-med.com/fruquintinib-phase-ii-clinical-results-in-colorectal-cancer-to-be-presented-at-the-2015-european-cancer-congress/", tier: "截止日前临床结果" },
+      { title: "ClinicalTrials.gov · FRESCO试验历史记录", url: "https://clinicaltrials.gov/study/NCT02314819?tab=history", tier: "截止日前试验登记" },
+      { title: "和黄医药 · FRESCOⅢ期阳性顶线结果", url: "https://www.hutch-med.com/positive-ph3-fruquintinib-crc-fresco/", tier: "后来真实结果" },
+      { title: "NMPA · 2018年度审评报告", url: "https://english.nmpa.gov.cn/2019-07/06/c_388358.htm", tier: "后来监管结果" }
+    ]
+  },
+  {
+    id: "KX826-CN-2023",
+    candidateId: "KX826-05-BID",
+    asset: "KX-826 0.5% BID / 福瑞他恩",
+    target: "Androgen receptor (AR)",
+    modality: "外用小分子AR拮抗剂",
+    stage: "中国案例 · Phase 3历史回测",
+    rights: "由开拓药业自主研发",
+    currentUse: "本回测只评价2023年中国男性AGA 0.5% BIDⅢ期；不等同于整个KX-826项目结论",
+    question: "中国男性Ⅱ期的安慰剂对照信号能否在740人的Ⅲ期中稳定复制？",
+    verdict: "保留成功可能 / 但重复性风险较高",
+    verdictClass: "recoverable",
+    recommendation: "继续Ⅲ期验证，但把效应量回归、安慰剂反应、依从性和TAHC测量一致性列为关键风险，而不是把Ⅱ期阳性直接外推",
+    probability: "自动计算中",
+    probabilityLabel: "2023年0.5% BIDⅢ期达到安慰剂对照主要终点",
+    confidence: 63,
+    evidenceCutoff: "2023-03-28（历史回测）",
+    step1Summary: "有资格继续但不确定性较高：Ⅱ期达到主要终点且安全性良好，但证据主要来自单项研究，终点对测量、依从性和安慰剂反应敏感。",
+    backtest: {
+      task: "只使用2023年3月28日前公开信息，预测中国男性AGA 0.5% BIDⅢ期是否达到主要终点。",
+      companyActionAtCutoff: "公司已完成740名受试者入组，计划在2023年第四季度公布顶线结果。",
+      outcomeDate: "2023-11-27",
+      outcome: "0.5% BID组相对基线促进毛发生长，但与安慰剂相比未达到统计学显著性，Ⅲ期主要终点失败。此后公司继续调整浓度和开发方案；后来的新研究不回填本次预测。",
+      actualSuccess: false,
+      actualLabel: "失败：0.5% BIDⅢ期未达到主要终点",
+      redesignFactorIds: [],
+      modelInput: { stage:"Phase 3", confidence:63, missing:2, conflicts:2, factorIds:["RANDOMIZED_PHASE2_SIGNAL","CLASS_MOA_PRECEDENT","ACCEPTABLE_SAFETY_PROFILE","SINGLE_STUDY_REPLICATION_RISK","PLACEBO_SENSITIVE_ENDPOINT"] }
+    },
+    knownFacts: [
+      "中国男性AGAⅡ期为多中心、随机、双盲、安慰剂对照研究。",
+      "公司披露0.5% BID组24周TAHC较安慰剂增加15.34根/cm²，P=0.024，达到Ⅱ期主要终点。",
+      "既往公开结果显示多数不良事件为轻度局部头皮反应，发生率与安慰剂相近。",
+      "中国Ⅲ期计划纳入740名成年男性，主要终点仍是24周TAHC相对安慰剂的变化。"
+    ],
+    risks: [
+      "Ⅱ期显著性接近常用阈值，单项研究效应量在Ⅲ期可能回归。",
+      "TAHC依赖图像定位、计数一致性、用药依从性和安慰剂组变化。",
+      "安全性良好解决不了疗效组间差异不足的问题。",
+      "同一终点与剂量直接放大，未充分回答Ⅱ期效应稳定性。"
+    ],
+    adjustments: [
+      { lever: "效应量假设", action: "用保守效应量和更高安慰剂反应重新做把握度情景。", impact: "降低假阳性", reason: "避免把单项Ⅱ期的观察效应原样带入Ⅲ期。" },
+      { lever: "测量体系", action: "统一摄影定位、TAHC中央判读与重复测量质控。", impact: "减少方差", reason: "终点噪声会直接削弱药物与安慰剂的组间差异。" },
+      { lever: "依从性", action: "增加用药记录与药瓶回收，预设低依从性敏感性分析。", impact: "提高可解释性", reason: "每日两次外用对真实依从性要求较高。" },
+      { lever: "剂量与制剂", action: "在确认头皮暴露后比较更高浓度或更优制剂，而非默认0.5%已最优。", impact: "保留重构空间", reason: "若安全窗宽，暴露不足可能是可改变变量。" }
+    ],
+    nextExperiment: "在揭盲前完成安慰剂反应、测量方差和依从性的压力测试；若失败，再以暴露证据决定是否重构剂量或制剂",
+    stopRule: "若经暴露和测量优化后仍不能形成稳定的安慰剂校正效应，则停止0.5% BID单药注册路径。",
+    sources: [
+      { title: "开拓药业 · Ⅱ期结果与Ⅲ期入组完成", url: "https://en.kintor.com.cn/news_details/1803365140053471232.html", tier: "截止日前公司披露" },
+      { title: "开拓药业 · AAD 2023机制与Ⅱ期数据", url: "https://en.kintor.com.cn/news_details/1803365144717537280.html", tier: "截止日前公司披露" },
+      { title: "港交所 · 2023年Ⅲ期设计与入组公告", url: "https://www1.hkexnews.hk/listedco/listconews/sehk/2023/0328/2023032801492_c.pdf", tier: "截止日前法定披露" },
+      { title: "港交所 · 2023年年报（Ⅲ期未达显著性）", url: "https://www1.hkexnews.hk/listedco/listconews/sehk/2024/0429/2024042900415.pdf", tier: "后来真实结果" },
+      { title: "开拓药业 · 2026年新关键研究结果", url: "https://en.kintor.com.cn/news_details/22.html", tier: "后续重构证据 · 不回填" }
     ]
   }
 ];
@@ -383,6 +503,8 @@ const evidence = [
   { tag: "P", asset: "Fitusiran", claim: "固定剂量方案发生严重血栓风险后，开发转向AT活性指导的个体化剂量；Qfitlia于2025年获FDA批准。", source: "FDA / Alnylam / Sanofi", quality: "监管与公司一级来源", updated: "2026-10" },
   { tag: "P", asset: "Etripamil", claim: "NODE-301五小时主要终点失败，但早期转复信号促使RAPID改用30分钟主要终点并允许重复给药；Cardamyst于2025年获批。", source: "SEC披露 / FDA", quality: "法定披露与监管来源", updated: "2026-10" },
   { tag: "P", asset: "Verubecestat", claim: "充分降低淀粉样相关指标未转化为认知或功能获益，轻中度与前驱期Ⅲ期研究均为阴性。", source: "NEJM / ClinicalTrials.gov", quality: "同行评议临床结果", updated: "2026-10" },
+  { tag: "P", asset: "呋喹替尼", claim: "证据截止日前随机对照Ⅱ期显示PFS 4.73个月对0.99个月；随后FRESCOⅢ期达到OS主要终点并在中国获批。", source: "和黄医药 / ClinicalTrials.gov / NMPA", quality: "公司、登记与监管一级来源", updated: "2026-10" },
+  { tag: "P", asset: "KX-826 0.5% BID", claim: "证据截止日前中国男性AGAⅡ期达到主要终点；2023年同剂量Ⅲ期相对安慰剂未达到统计学显著性。", source: "开拓药业 / 港交所法定披露", quality: "公司与法定披露", updated: "2026-10" },
   { tag: "E", asset: "历史回测规则", claim: "模型只允许读取预设证据截止日前的信息；阶段先验赔率乘以证据修正乘数形成概率区间，后来结果只用于检验命中，不回填初始预测。", source: "v1.0-rule-backtest", quality: "模型规则", updated: "2026-10" },
   { tag: "F", asset: "Formation 运营模式", claim: "资产选择、开发策略与临床执行属于连续决策链。", source: "Formation 官网与公开材料", quality: "一级来源", updated: "2026-10" },
   { tag: "F", asset: "适应症全景分析", claim: "原始数据需标准化；同行评议文献通常优先于注册库中的结果摘要。", source: "Formation 工程博客", quality: "一级来源", updated: "2026-10" },
@@ -631,7 +753,7 @@ function renderWorkspace() {
   const selected = assets.find(a => a.id === selectedAssetId) || assets[0];
   root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答六个问题</p><h2>把复杂的资产判断，变成一条可以验证的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases" class="primary-button">查看真实案例试跑</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>模型验证期</strong><p>决策逻辑已成型，正在锁定规则并用独立案例检验预测能力。</p></aside></section>
     <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到验证模型</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>双重闭环</b><span>STEP 3 把新方案回写 STEP 2；STEP 4 用真实结果检查模型，只在整批验证后统一校准。</span></div></section>
-    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>用中国项目与海外历史回测检查这套逻辑</h2><p>两个和铂案例检验当前判断；三个海外案例分别检验安全性重构、试验设计重构和及时停止。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-real-case-entry="${item.id}"><span>中国案例 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases"><span>海外回测</span><strong>3 个历史案例</strong><small>可救、重构与淘汰</small></button></div><div class="case-entry-actions"><button data-overview-view="cases" class="primary-button">查看案例</button><button data-overview-view="validation" class="secondary-button">查看验证结果</button></div></section>
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮真实验证</p><h2>用中国项目与国内外历史回测检查这套逻辑</h2><p>两个和铂案例检验当前判断；五个历史案例在锁定证据后计算，其中新增一个国内成功案例和一个国内失败案例。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-real-case-entry="${item.id}"><span>中国案例 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases"><span>国内外回测</span><strong>5 个历史案例</strong><small>成功、失败、重构与及时停止</small></button></div><div class="case-entry-actions"><button data-overview-view="cases" class="primary-button">查看案例</button><button data-overview-view="validation" class="secondary-button">查看验证结果</button></div></section>
     ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
@@ -696,11 +818,11 @@ function renderCaseStudies() {
   const historicalResults = historicalCases.map(entry => entry.backtestResult);
   const backtestHits = historicalResults.filter(result => result.hit).length;
   const isBacktest = Boolean(item.backtestResult);
-  root.innerHTML = `<div class="view-heading case-heading"><div><p class="eyebrow">Real-world pilot · 公开信息试跑</p><h2>不是展示资料，而是让真实案例走完整条决策逻辑</h2><p>和铂案例用于面向未来的预测；三个海外案例先冻结历史证据，再由同一套规则自动计算，最后才揭示真实结果。</p></div><span class="draft-badge">证据截止 ${item.evidenceCutoff}</span></div>
-    <section class="backtest-scorecard panel"><div><span>历史回测</span><strong>${backtestHits} / ${historicalResults.length} 命中</strong><small>Fitusiran、Etripamil、Verubecestat</small></div><div><span>统一判定门槛</span><strong>区间上限 &lt; ${historicalBacktestModel.threshold}% = 预测失败</strong><small>实际失败案例落在门槛下方即计为命中</small></div><p>这是流程验证，不是模型已被证明：样本只有3个，先验与证据乘数仍需用更多历史案例盲法校准。</p></section>
+  root.innerHTML = `<div class="view-heading case-heading"><div><p class="eyebrow">Real-world pilot · 公开信息试跑</p><h2>不是展示资料，而是让真实案例走完整条决策逻辑</h2><p>和铂案例用于面向未来的预测；五个国内外案例先冻结历史证据，再由同一套规则自动计算，最后才揭示真实结果。</p></div><span class="draft-badge">证据截止 ${item.evidenceCutoff}</span></div>
+    <section class="backtest-scorecard panel"><div><span>历史回测</span><strong>${backtestHits} / ${historicalResults.length} 命中</strong><small>海外3例 + 国内2例</small></div><div><span>统一判定门槛</span><strong>区间上限 &lt; ${historicalBacktestModel.threshold}% = 预测失败</strong><small>实际失败案例落在门槛下方即计为命中</small></div><p>这是流程验证，不是模型已被证明：样本只有${historicalResults.length}个，并且当前新增案例仍是事后研究；未命中也会保留，用于暴露权重和变量缺口。</p></section>
     <div class="case-switcher" role="tablist" aria-label="选择真实案例">${realCases.map(entry=>`<button role="tab" data-real-case="${entry.id}" aria-selected="${entry.id===item.id}" class="${entry.id===item.id?"active":""}"><span>${entry.stage}</span><strong>${entry.asset}</strong><small>${entry.target}</small></button>`).join("")}</div>
-    <section class="case-verdict panel"><div class="case-identity"><span class="fact-label">公开事实</span><h2>${item.asset}</h2><p>${item.modality} · ${item.target} · ${item.stage}</p><small>当前公开方向：${item.currentUse}<br>${item.rights}</small></div><div class="case-main-verdict"><span>${isBacktest ? "历史时点系统判断" : "系统当前判断"}</span><strong class="case-status status-${item.verdictClass}">${item.verdict}</strong><p>${item.recommendation}</p></div><div class="case-probability"><span>${isBacktest ? "自动回测区间" : "研究性预测区间"}</span><strong>${item.probability}</strong><small>${item.probabilityLabel}</small><i><b style="width:${item.confidence}%"></b></i><em>证据置信度 ${item.confidence}%${isBacktest ? ` · 点估计 ${item.backtestResult.point}%` : ""}</em></div></section>
-    ${item.backtest ? `<section class="case-backtest panel"><div><span>模型可见信息截止</span><strong>${item.evidenceCutoff}</strong></div><div><span>自动预测 · 未读取结果</span><strong>${item.backtestResult.point}% · ${item.probability}</strong><p>${item.backtestResult.predictedLabel}</p></div><div><span>后来真实结果 · 不进入初始预测</span><strong>${item.backtest.outcomeDate} · ${item.backtest.actualLabel}</strong><p>${item.backtest.outcome}</p></div><div class="${item.backtestResult.hit ? "backtest-hit" : "backtest-miss"}"><span>回测判定</span><strong>${item.backtestResult.hit ? "命中" : "未命中"}</strong><p>${item.backtestResult.predictedSuccess ? "预测保留成功可能" : "预测失败"}</p></div></section>${disclosure("查看自动计算过程", `阶段先验 ${item.backtestResult.prior}% → 点估计 ${item.backtestResult.point}% → 区间 ${item.probability}`, renderBacktestTrace(item))}` : ""}
+    <section class="case-verdict panel"><div class="case-identity"><span class="fact-label">公开事实</span><h2>${item.asset}</h2><p>${item.modality} · ${item.target} · ${item.stage}</p><small>当前公开方向：${item.currentUse}<br>${item.rights}</small></div><div class="case-main-verdict"><span>${isBacktest ? "系统历史回测结论 · 非当时公司决定" : "系统当前判断"}</span><strong class="case-status status-${item.verdictClass}">${item.verdict}</strong><p>${item.recommendation}</p></div><div class="case-probability"><span>${isBacktest ? "自动回测区间" : "研究性预测区间"}</span><strong>${item.probability}</strong><small>${item.probabilityLabel}</small><i><b style="width:${item.confidence}%"></b></i><em>证据置信度 ${item.confidence}%${isBacktest ? ` · 点估计 ${item.backtestResult.point}%` : ""}</em></div></section>
+    ${item.backtest ? `<section class="case-backtest panel"><div><span>模型可见信息截止</span><strong>${item.evidenceCutoff}</strong></div><div><span>系统自动预测 · 未读取结果</span><strong>${item.backtestResult.point}% · ${item.probability}</strong><p>${item.backtestResult.predictedLabel}</p></div><div><span>当时公司实际行动</span><strong>公司事实 · 非模型结论</strong><p>${item.backtest.companyActionAtCutoff}</p></div><div><span>后来真实结果 · 不进入初始预测</span><strong>${item.backtest.outcomeDate} · ${item.backtest.actualLabel}</strong><p>${item.backtest.outcome}</p></div><div class="${item.backtestResult.hit ? "backtest-hit" : "backtest-miss"}"><span>回测判定</span><strong>${item.backtestResult.hit ? "命中" : "未命中"}</strong><p>${item.backtestResult.predictedSuccess ? "预测保留成功可能" : "预测失败"}</p></div></section>${disclosure("查看自动计算过程", `阶段先验 ${item.backtestResult.prior}% → 点估计 ${item.backtestResult.point}% → 区间 ${item.probability}`, renderBacktestTrace(item))}` : ""}
     <section class="case-question panel"><span>这个案例真正要回答的问题</span><h2>${item.question}</h2><p>系统不会把“有信号”直接等同于“会成功”，而是继续寻找可以改变结论的开发变量。</p></section>
     <section class="case-path"><div class="overview-section-head"><div><p class="eyebrow">案例如何走过系统</p><h2>先判断资格，再提出调整</h2></div><span>点击展开每一步依据</span></div>
       ${disclosure("STEP 1 · 这个资产还有没有继续研究的资格？", item.step1Summary || `${item.verdict}：没有发现足以直接判定为科学死亡的公开证据。`, `<div class="case-two-column"><article><span class="fact-label">关键支持证据</span><ul>${item.knownFacts.map(fact=>`<li>${fact}</li>`).join("")}</ul></article><article><span class="risk-label">反对证据与限制</span><ul>${item.risks.map(risk=>`<li>${risk}</li>`).join("")}</ul></article></div>`, true)}
@@ -724,10 +846,10 @@ function renderCaseStudies() {
 
 const validationStages = [
   { no:"01", title:"锁定模型版本", status:"已完成", statusClass:"done", rule:"固定先验、证据乘数、区间算法和30%失败门槛；验证期间不得逐例改规则。", output:`基线版本 ${historicalBacktestModel.version}` },
-  { no:"02", title:"建立独立验证集", status:"待建立", statusClass:"pending", rule:"选择没有参与规则设计的成功与失败案例，并预先写明纳入、排除和结果定义。", output:"当前3例属于说明性历史回测，不计作独立验证集" },
+  { no:"02", title:"建立独立验证集", status:"待建立", statusClass:"pending", rule:"选择没有参与规则设计的成功与失败案例，并预先写明纳入、排除和结果定义。", output:`当前${historicalCases.length}例属于说明性历史回测，不计作独立验证集` },
   { no:"03", title:"进行盲法预测", status:"待执行", statusClass:"pending", rule:"研究者只看到证据截止日前的信息；最终结果在预测完成前保持隐藏。", output:"输出概率区间、方向、建议与关键未知项" },
   { no:"04", title:"锁定预测结果", status:"机制已具备", statusClass:"ready", rule:"保存证据快照、截止日期、模型版本、概率区间和建议，之后只读不可覆盖。", output:"预测版本记录已经支持锁定与追溯" },
-  { no:"05", title:"揭示结果并校准", status:"内部回测完成", statusClass:"partial", rule:"整批揭示结果后统计命中、假阳性、假阴性和概率误差；只在批次结束后统一校准。", output:"3例说明性回测完成；独立验证仍待进行" }
+  { no:"05", title:"揭示结果并校准", status:"内部回测完成", statusClass:"partial", rule:"整批揭示结果后统计命中、假阳性、假阴性和概率误差；只在批次结束后统一校准。", output:`${historicalCases.length}例说明性回测完成；独立验证仍待进行` }
 ];
 
 function getValidationMetrics() {
@@ -747,11 +869,11 @@ function getValidationMetrics() {
 function renderValidation() {
   const metrics = getValidationMetrics();
   root.innerHTML = `<div class="view-heading validation-heading"><div><p class="eyebrow">STEP 4 · Model Validation & Calibration</p><h2>先把答案锁住，再让真实结果检验模型</h2><p>这里不继续评价某个资产，而是评价模型本身。说明性回测用于检查流程；只有未参与规则设计的独立盲法案例，才能验证预测能力。</p></div><span class="draft-badge">基线模型 ${historicalBacktestModel.version}</span></div>
-    <section class="validation-hero panel"><div><span>当前验证阶段</span><strong>内部说明性回测</strong><p>流程已跑通，但尚未完成独立、盲法的外部验证。</p></div><div><span>说明性回测</span><strong>${metrics.hits} / ${metrics.rows.length}</strong><small>方向命中；不能等同模型已验证</small></div><div><span>独立验证集</span><strong>0</strong><small>下一轮必须新增，不能复用当前3例</small></div><div><span>Brier分数</span><strong>${metrics.brier}</strong><small>越低越好；当前样本过小</small></div></section>
+    <section class="validation-hero panel"><div><span>当前验证阶段</span><strong>内部说明性回测</strong><p>流程已跑通，但尚未完成独立、盲法的外部验证。</p></div><div><span>说明性回测</span><strong>${metrics.hits} / ${metrics.rows.length}</strong><small>方向命中；不能等同模型已验证</small></div><div><span>独立验证集</span><strong>0</strong><small>下一轮必须新增，不能复用当前${metrics.rows.length}例</small></div><div><span>Brier分数</span><strong>${metrics.brier}</strong><small>越低越好；当前样本过小</small></div></section>
     <section class="validation-workflow"><div class="overview-section-head"><div><p class="eyebrow">验证闭环</p><h2>五个步骤必须按顺序完成</h2></div><span>任何一步缺失，结论都只能叫“回测”，不能叫“验证”</span></div><div class="validation-stage-grid">${validationStages.map(stage=>`<article class="panel validation-stage"><div><span>${stage.no}</span><em class="validation-status status-${stage.statusClass}">${stage.status}</em></div><h3>${stage.title}</h3><p>${stage.rule}</p><small>${stage.output}</small></article>`).join("")}</div></section>
-    <section class="panel validation-results"><div class="panel-head"><div><p class="eyebrow">当前可见结果</p><h2>3个案例方向吻合，但仍属于规则开发阶段</h2><p>失败判定规则：预测区间上限低于${historicalBacktestModel.threshold}%。</p></div><span class="draft-badge">非独立验证集</span></div><div class="table-wrap"><table><thead><tr><th>案例</th><th>证据截止</th><th>自动预测</th><th>预测方向</th><th>后来结果</th><th>回测</th></tr></thead><tbody>${metrics.rows.map(row=>`<tr><td><strong>${row.asset}</strong><small>说明性历史回测</small></td><td>${row.cutoff}</td><td><strong>${row.result.point}%</strong><small>${row.result.low}–${row.result.high}%</small></td><td>${row.result.predictedSuccess?"保留成功可能":"预测失败"}</td><td>${row.actual}</td><td><span class="validation-hit ${row.result.hit?"hit":"miss"}">${row.result.hit?"命中":"未命中"}</span></td></tr>`).join("")}</tbody></table></div><div class="validation-error-strip"><span>假阳性 <b>${metrics.falsePositive}</b></span><span>假阴性 <b>${metrics.falseNegative}</b></span><span>方向命中率 <b>${Math.round(metrics.hits / metrics.rows.length * 100)}%</b></span><em>这些数字只描述当前3例，不代表未来表现。</em></div></section>
-    ${disclosure("查看指标与防止事后偏差的规则", "为什么3/3仍不能证明模型可靠？", `<div class="validation-rule-grid"><article><span>数据截止</span><p>只允许使用截止日前已经公开、可追溯的事实；事件发生但尚未披露的信息不可使用。</p></article><article><span>版本冻结</span><p>验证期间不得因单个案例结果修改先验、乘数或阈值；任何变更都生成新版本。</p></article><article><span>批量揭盲</span><p>一批预测全部锁定后再统一揭示结果，避免看一个结果就调一次模型。</p></article><article><span>方向错误</span><p>假阳性是预测可成功但实际失败；假阴性是预测失败但实际成功，两者必须分别统计。</p></article><article><span>概率校准</span><p>Brier分数衡量概率与0/1结果的距离；还需要按概率区间比较长期实际成功频率。</p></article><article><span>模型升级</span><p>校准后的规则必须作为新版本重新接受独立验证，不能覆盖旧预测记录。</p></article></div>`)}
-    <section class="panel validation-next"><div><p class="eyebrow">下一步</p><h2>建立第一批真正独立的验证案例</h2><p>当前页面已经把流程、锁定规则和指标准备好；下一步应选择未参与v1.0设计的历史案例，隐藏结局后批量计算。</p></div><div><button data-validation-view="cases" class="secondary-button">查看说明性案例</button><button data-validation-view="registry" class="primary-button">查看锁定记录</button></div></section>`;
+    <section class="panel validation-results"><div class="panel-head"><div><p class="eyebrow">当前可见结果</p><h2>${metrics.rows.length}个案例中${metrics.hits}个方向吻合，错误同样保留</h2><p>失败判定规则：预测区间上限低于${historicalBacktestModel.threshold}%。</p></div><span class="draft-badge">非独立验证集</span></div><div class="table-wrap"><table><thead><tr><th>案例</th><th>证据截止</th><th>自动预测</th><th>预测方向</th><th>后来结果</th><th>回测</th></tr></thead><tbody>${metrics.rows.map(row=>`<tr><td><strong>${row.asset}</strong><small>说明性历史回测</small></td><td>${row.cutoff}</td><td><strong>${row.result.point}%</strong><small>${row.result.low}–${row.result.high}%</small></td><td>${row.result.predictedSuccess?"保留成功可能":"预测失败"}</td><td>${row.actual}</td><td><span class="validation-hit ${row.result.hit?"hit":"miss"}">${row.result.hit?"命中":"未命中"}</span></td></tr>`).join("")}</tbody></table></div><div class="validation-error-strip"><span>假阳性 <b>${metrics.falsePositive}</b></span><span>假阴性 <b>${metrics.falseNegative}</b></span><span>方向命中率 <b>${Math.round(metrics.hits / metrics.rows.length * 100)}%</b></span><em>这些数字只描述当前${metrics.rows.length}例，不代表未来表现。</em></div></section>
+    ${disclosure("查看指标与防止事后偏差的规则", `为什么${metrics.hits}/${metrics.rows.length}仍不能证明模型可靠？`, `<div class="validation-rule-grid"><article><span>数据截止</span><p>只允许使用截止日前已经公开、可追溯的事实；事件发生但尚未披露的信息不可使用。</p></article><article><span>版本冻结</span><p>验证期间不得因单个案例结果修改先验、乘数或阈值；任何变更都生成新版本。</p></article><article><span>批量揭盲</span><p>一批预测全部锁定后再统一揭示结果，避免看一个结果就调一次模型。</p></article><article><span>方向错误</span><p>假阳性是预测可成功但实际失败；假阴性是预测失败但实际成功，两者必须分别统计。</p></article><article><span>概率校准</span><p>Brier分数衡量概率与0/1结果的距离；还需要按概率区间比较长期实际成功频率。</p></article><article><span>模型升级</span><p>校准后的规则必须作为新版本重新接受独立验证，不能覆盖旧预测记录。</p></article></div>`)}
+    <section class="panel validation-next"><div><p class="eyebrow">本轮学到什么</p><h2>未命中的国内失败案例，指出了下一轮要补的变量</h2><p>KX-826 0.5% BID提示：随机Ⅱ期阳性仍可能在Ⅲ期被安慰剂效应、测量方差、依从性和效应量回归击穿。下一版应先增加这些变量，再建立真正独立的验证集。</p></div><div><button data-validation-view="cases" class="secondary-button">查看说明性案例</button><button data-validation-view="registry" class="primary-button">查看锁定记录</button></div></section>`;
   document.querySelectorAll("[data-validation-view]").forEach(button=>button.addEventListener("click",()=>switchView(button.dataset.validationView)));
 }
 
@@ -1099,7 +1221,9 @@ const step2Candidates = [
   { id:"HBM1020-ENRICH", asset:"HBM1020", indication:"HHLA2高表达实体瘤", plan:"PD-L1阴性/耐药人群富集扩展", stage:"Phase 1", pos:38, intervalLow:30, intervalHigh:45, futureValue:76, timeMonths:20, cost:37, commercialLife:12.8, strategic:75, confidence:39, stability:36, missing:8, conflicts:1, gate:"通过", drivers:["B7H7/HHLA2提供差异化免疫逃逸假设","早期安全性支持继续探索","生物标志物富集可以低成本验证核心假设"], unknown:"疾病稳定能否转化为机制一致、可重复的客观缓解。", template:"Phase 1：靶点表达、PK/PD、生物标志物与早期疗效优先", realCase:true },
   { id:"FITUSIRAN-ATDR", asset:"Fitusiran", indication:"血友病A/B", plan:"AT活性指导的个体化剂量与风险管理", stage:"Phase 3", pos:historicalBacktestByCandidate["FITUSIRAN-ATDR"].point, intervalLow:historicalBacktestByCandidate["FITUSIRAN-ATDR"].low, intervalHigh:historicalBacktestByCandidate["FITUSIRAN-ATDR"].high, futureValue:78, timeMonths:24, cost:58, commercialLife:10.0, strategic:72, confidence:historicalBacktestByCandidate["FITUSIRAN-ATDR"].confidence, stability:72, missing:3, conflicts:2, gate:"通过（安全性条件）", drivers:["出血控制与靶点调控仍有支持","严重安全风险与暴露强度存在可干预联系","动态剂量可以直接检验能否恢复净获益"], unknown:"AT目标窗口内能否稳定保留疗效并把严重血栓降至可接受水平。", template:"Phase 3：净临床获益、安全性风险管理与可执行性优先", realCase:true },
   { id:"ETRIPAMIL-RAPID", asset:"Etripamil", indication:"阵发性室上性心动过速", plan:"30分钟主要终点 + 必要时重复给药", stage:"Phase 3", pos:historicalBacktestByCandidate["ETRIPAMIL-RAPID"].point, intervalLow:historicalBacktestByCandidate["ETRIPAMIL-RAPID"].low, intervalHigh:historicalBacktestByCandidate["ETRIPAMIL-RAPID"].high, futureValue:71, timeMonths:22, cost:45, commercialLife:9.2, strategic:70, confidence:historicalBacktestByCandidate["ETRIPAMIL-RAPID"].confidence, stability:68, missing:3, conflicts:1, gate:"通过", drivers:["早期转复信号与快速起效药理一致","终点时间窗和给药方案可直接重构","院外自我用药具有清晰差异化"], unknown:"预设30分钟窗口能否独立重复早期转复获益。", template:"Phase 3：预设终点、给药方案与临床可感知获益优先", realCase:true },
-  { id:"VERUBEC-STOP", asset:"Verubecestat", indication:"前驱期阿尔茨海默病", plan:"不继续大型临床；仅保留机制反证", stage:"Phase 3", pos:historicalBacktestByCandidate["VERUBEC-STOP"].point, intervalLow:historicalBacktestByCandidate["VERUBEC-STOP"].low, intervalHigh:historicalBacktestByCandidate["VERUBEC-STOP"].high, futureValue:24, timeMonths:40, cost:95, commercialLife:6.0, strategic:18, confidence:historicalBacktestByCandidate["VERUBEC-STOP"].confidence, stability:90, missing:1, conflicts:0, gate:"不通过", drivers:["充分靶点调控未转化为临床获益","大型Ⅲ期因无效提前终止","不良事件进一步压缩净获益空间"], unknown:"是否存在足够强的新人体因果证据解释靶点调控与临床无效之间的断裂。", template:"Phase 3失败：临床获益、机制因果链与停止规则优先", realCase:true }
+  { id:"VERUBEC-STOP", asset:"Verubecestat", indication:"前驱期阿尔茨海默病", plan:"不继续大型临床；仅保留机制反证", stage:"Phase 3", pos:historicalBacktestByCandidate["VERUBEC-STOP"].point, intervalLow:historicalBacktestByCandidate["VERUBEC-STOP"].low, intervalHigh:historicalBacktestByCandidate["VERUBEC-STOP"].high, futureValue:24, timeMonths:40, cost:95, commercialLife:6.0, strategic:18, confidence:historicalBacktestByCandidate["VERUBEC-STOP"].confidence, stability:90, missing:1, conflicts:0, gate:"不通过", drivers:["充分靶点调控未转化为临床获益","大型Ⅲ期因无效提前终止","不良事件进一步压缩净获益空间"], unknown:"是否存在足够强的新人体因果证据解释靶点调控与临床无效之间的断裂。", template:"Phase 3失败：临床获益、机制因果链与停止规则优先", realCase:true },
+  { id:"FRUQUINTINIB-FRESCO", asset:"呋喹替尼", indication:"三线及以上mCRC", plan:"FRESCO随机对照Ⅲ期OS验证", stage:"Phase 3", pos:historicalBacktestByCandidate["FRUQUINTINIB-FRESCO"].point, intervalLow:historicalBacktestByCandidate["FRUQUINTINIB-FRESCO"].low, intervalHigh:historicalBacktestByCandidate["FRUQUINTINIB-FRESCO"].high, futureValue:82, timeMonths:18, cost:62, commercialLife:10.5, strategic:83, confidence:historicalBacktestByCandidate["FRUQUINTINIB-FRESCO"].confidence, stability:78, missing:2, conflicts:1, gate:"通过", drivers:["随机对照Ⅱ期PFS效应强且方向清楚","人群与Ⅲ期路径基本一致","VEGFR机制与安全风险可管理"], unknown:"Ⅱ期PFS效应能否在更大样本中转化为OS获益。", template:"Phase 3：确认性疗效、OS、净获益与统计设计优先", realCase:true },
+  { id:"KX826-05-BID", asset:"KX-826 0.5% BID", indication:"中国成年男性AGA", plan:"24周TAHC安慰剂对照Ⅲ期", stage:"Phase 3", pos:historicalBacktestByCandidate["KX826-05-BID"].point, intervalLow:historicalBacktestByCandidate["KX826-05-BID"].low, intervalHigh:historicalBacktestByCandidate["KX826-05-BID"].high, futureValue:72, timeMonths:10, cost:38, commercialLife:11.2, strategic:76, confidence:historicalBacktestByCandidate["KX826-05-BID"].confidence, stability:52, missing:2, conflicts:2, gate:"通过（重复性条件）", drivers:["中国男性Ⅱ期达到安慰剂对照主要终点","局部安全性支持继续验证","同剂量同终点具备直接确认路径"], unknown:"单项Ⅱ期效应能否抵御安慰剂反应、测量方差与效应量回归。", template:"Phase 3：效应可重复性、安慰剂反应、依从性与测量质控优先", realCase:true }
 ];
 
 function getStep2CandidatePool() {
@@ -1265,7 +1389,9 @@ const step3FailureMaps = {
   HBM1020:{ biology:42,molecule:18,pk:28,targetEngagement:62,dose:36,patient:82,endpoint:48,heterogeneity:76,trial:58,operational:24 },
   Fitusiran:{ biology:8,molecule:18,pk:22,targetEngagement:12,dose:92,patient:20,endpoint:18,heterogeneity:16,trial:38,operational:48 },
   Etripamil:{ biology:12,molecule:14,pk:20,targetEngagement:18,dose:58,patient:24,endpoint:94,heterogeneity:25,trial:90,operational:28 },
-  Verubecestat:{ biology:88,molecule:24,pk:10,targetEngagement:8,dose:46,patient:68,endpoint:25,heterogeneity:44,trial:22,operational:18 }
+  Verubecestat:{ biology:88,molecule:24,pk:10,targetEngagement:8,dose:46,patient:68,endpoint:25,heterogeneity:44,trial:22,operational:18 },
+  呋喹替尼:{ biology:12,molecule:16,pk:22,targetEngagement:20,dose:28,patient:24,endpoint:38,heterogeneity:30,trial:26,operational:24 },
+  "KX-826 0.5% BID":{ biology:20,molecule:28,pk:46,targetEngagement:40,dose:62,patient:24,endpoint:74,heterogeneity:42,trial:68,operational:58 }
 };
 
 const step3ScenarioDefinitions = [
@@ -1452,7 +1578,7 @@ function renderRegistry() {
   const assetNames = [...new Set(predictionHistory.map(item=>item.asset))];
   const records = predictionHistory.filter(item=>item.asset===registryAsset);
   const latest = records[records.length-1];
-  root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">Prediction Version History</p><h2>为什么要保留每一次预测？</h2><p>当前决策始终使用最新证据和最新预测；旧版本只作为只读历史记录保留。新证据出现时，系统生成一个新版本，而不是改写当时的答案，这样才能判断模型当时是否准确，以及结论为什么发生变化。</p></div><span class="draft-badge">当前用最新版本 · 历史版本只读</span></div><div class="registry-toolbar">${assetNames.map(name=>`<button data-registry-asset="${name}" class="${registryAsset===name?"active":""}">${name}</button>`).join("")}</div><section class="panel registry-hero"><div><span>当前资产</span><h2>${registryAsset}</h2><p>${records.length} 个预测版本 · 当前决策使用最新版本 · 最新证据截止 ${latest.cutoff}</p></div><div><span>最新 PoS</span><strong>${latest.pos}%</strong><small>80% 区间 ${latest.interval}</small></div><div><span>当前建议</span><strong>${latest.recommendation}</strong><small>${latest.unknown}</small></div></section><section class="registry-timeline">${records.map((item,index)=>`<article class="panel"><div class="registry-node"><span>${index+1}</span><i></i></div><div class="registry-version"><small>${item.date}</small><h3>${item.version}</h3><p>证据截止 ${item.cutoff} · ${item.model}</p></div><div class="registry-pos"><span>PoS</span><strong>${item.pos}%</strong><small>${item.interval}</small></div><div class="registry-change"><span>关键未知项</span><p>${item.unknown}</p><small>${item.evidence} 条结构化证据</small></div><div class="registry-recommendation"><span>当时建议</span><strong>${item.recommendation}</strong><small>${item.immutable?"历史版本已锁定 · 仅供回看":"草稿"}</small></div></article>`).join("")}</section><section class="panel registry-calibration"><div><p class="eyebrow">如何使用这份记录</p><h2>新证据更新当前判断，旧版本用于回测</h2></div><div><span>01</span><p>预测时保存证据快照与模型版本</p></div><div><span>02</span><p>新证据生成新版本，当前决策自动采用最新版</p></div><div><span>03</span><p>临床结果公布后，比较当时预测与真实结果</p></div><div><span>04</span><p>校准先验、变量、权重和置信区间</p></div><em>3个海外历史案例已接入真实结果，其余仍为结构演示</em></section>`;
+  root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">Prediction Version History</p><h2>为什么要保留每一次预测？</h2><p>当前决策始终使用最新证据和最新预测；旧版本只作为只读历史记录保留。新证据出现时，系统生成一个新版本，而不是改写当时的答案，这样才能判断模型当时是否准确，以及结论为什么发生变化。</p></div><span class="draft-badge">当前用最新版本 · 历史版本只读</span></div><div class="registry-toolbar">${assetNames.map(name=>`<button data-registry-asset="${name}" class="${registryAsset===name?"active":""}">${name}</button>`).join("")}</div><section class="panel registry-hero"><div><span>当前资产</span><h2>${registryAsset}</h2><p>${records.length} 个预测版本 · 当前决策使用最新版本 · 最新证据截止 ${latest.cutoff}</p></div><div><span>最新 PoS</span><strong>${latest.pos}%</strong><small>80% 区间 ${latest.interval}</small></div><div><span>当前建议</span><strong>${latest.recommendation}</strong><small>${latest.unknown}</small></div></section><section class="registry-timeline">${records.map((item,index)=>`<article class="panel"><div class="registry-node"><span>${index+1}</span><i></i></div><div class="registry-version"><small>${item.date}</small><h3>${item.version}</h3><p>证据截止 ${item.cutoff} · ${item.model}</p></div><div class="registry-pos"><span>PoS</span><strong>${item.pos}%</strong><small>${item.interval}</small></div><div class="registry-change"><span>关键未知项</span><p>${item.unknown}</p><small>${item.evidence} 条结构化证据</small></div><div class="registry-recommendation"><span>当时建议</span><strong>${item.recommendation}</strong><small>${item.immutable?"历史版本已锁定 · 仅供回看":"草稿"}</small></div></article>`).join("")}</section><section class="panel registry-calibration"><div><p class="eyebrow">如何使用这份记录</p><h2>新证据更新当前判断，旧版本用于回测</h2></div><div><span>01</span><p>预测时保存证据快照与模型版本</p></div><div><span>02</span><p>新证据生成新版本，当前决策自动采用最新版</p></div><div><span>03</span><p>临床结果公布后，比较当时预测与真实结果</p></div><div><span>04</span><p>校准先验、变量、权重和置信区间</p></div><em>${historicalCases.length}个国内外历史案例已接入真实结果，其余仍为结构演示</em></section>`;
   wrapElementInDisclosure(document.querySelector(".registry-timeline"), "查看全部历史预测版本", "旧版本保留当时的证据和结论；最新版本负责支持当前决策。", false);
   document.querySelectorAll("[data-registry-asset]").forEach(button=>button.addEventListener("click",()=>{registryAsset=button.dataset.registryAsset;renderRegistry();}));
 }
