@@ -555,6 +555,22 @@ const evidence = [
   { tag: "E", asset: "STEP 1 海选优先分", claim: "海选后优先分用于研究资源排序，不替代 STEP 2 的风险调整价值比较。", source: "v0.4 方法规范", quality: "模型规则", updated: "2026-10" }
 ];
 
+function getEvidenceAuditRecord(entry, index) {
+  const internalRecord = entry.tag === "E" || /模型|假设|草案|扩展逻辑|待专家/.test(entry.quality);
+  const relatedCase = internalRecord ? null : realCases.find(item => {
+    const caseName = item.asset.split(" / ")[0];
+    return entry.asset.includes(caseName) || caseName.includes(entry.asset);
+  });
+  const primarySources = relatedCase?.sources?.slice(0, 3) || [];
+  return {
+    id: `EV-${String(index + 1).padStart(3, "0")}`,
+    primarySources,
+    cutoff: relatedCase?.evidenceCutoff?.split("（")[0] || "未单独设定",
+    accessed: "2026-10-07",
+    updated: entry.updated
+  };
+}
+
 const sourcePolicy = [
   { tier: "A", title: "决策级事实", sources: "监管审评文件、正式临床结果、同行评议全文、公司法定披露", use: "可支持硬性否决条件或关键结论" },
   { tier: "B", title: "强支持证据", sources: "试验注册库、会议完整摘要、专利、可信交易公告、遗传学数据库", use: "支持评分与冲突核查" },
@@ -800,6 +816,24 @@ const journeyQuestions = [
   { no:"06", step:"STEP 4", title:"这套模型到底准不准？", answer:"锁定规则和预测，用独立案例盲法检验，再按整批结果校准。", output:"输出：命中、误判与校准结果", view:"validation" }
 ];
 
+const versionRegistry = [
+  { name:"产品界面", version:"v1.0", use:"页面结构、交互与验证闭环", status:"当前分享版本" },
+  { name:"STEP 1 海选规则", version:"v0.4", use:"Gate、可救性分类与优先分", status:"规则草版" },
+  { name:"历史回测模型", version:historicalBacktestModel.version, use:"阶段先验 × 证据乘数 × 区间算法", status:"内部样本回放" },
+  { name:"和铂前瞻预测", version:"v0.9-pilot", use:"HBM4003 / HBM1020 研究性半定量输出", status:"概率已锁定" },
+  { name:"STEP 3 场景引擎", version:"v0.9-demo", use:"重构情景、Pareto 与回写演示", status:"演示模型" }
+];
+
+function renderVersionLegend() {
+  return disclosure(
+    "查看版本说明",
+    "产品界面、海选规则、历史回测、前瞻预测与场景引擎分别管理版本。",
+    `<div class="version-legend-intro"><b>为什么不是同一个版本号？</b><span>界面版本表示网站呈现；模型版本表示当时实际使用的规则与参数。分开记录，才能避免界面更新覆盖历史预测。</span></div><div class="version-legend-grid">${versionRegistry.map(item=>`<article><span>${item.name}</span><strong>${item.version}</strong><p>${item.use}</p><small>${item.status}</small></article>`).join("")}</div>`,
+    false,
+    "version-disclosure"
+  );
+}
+
 function disclosure(title, summary, content, open=false, className="") {
   return `<details class="logic-disclosure ${className}" ${open ? "open" : ""}><summary><div><strong>${title}</strong><span>${summary}</span></div><i aria-hidden="true"></i></summary><div class="disclosure-body">${content}</div></details>`;
 }
@@ -808,7 +842,8 @@ function renderWorkspace() {
   const selected = assets.find(a => a.id === selectedAssetId) || assets[0];
   root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答六个问题</p><h2>把复杂的资产判断，变成一条可以验证的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases2" class="primary-button">查看真实案例试跑 2.0</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>模型验证期</strong><p>决策逻辑已成型，正在锁定规则并用独立案例检验预测能力。</p></aside></section>
     <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到验证模型</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>双重闭环</b><span>STEP 3 把新方案回写 STEP 2；STEP 4 用真实结果检查模型，只在整批验证后统一校准。</span></div></section>
-    <section class="case-entry panel"><div><p class="eyebrow">第一轮模型测试</p><h2>把历史回放与前瞻预测分开查看</h2><p>五个历史案例只描述样本内方向一致性；两个和铂案例作为已锁定的前瞻预测，等待未来真实结果。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-overview-view="cases2"><span>前瞻锁定 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases2"><span>样本内回放</span><strong>5 个历史案例</strong><small>4例方向一致，1例方向不一致</small></button></div><div class="case-entry-actions"><button data-overview-view="cases2" class="primary-button">查看案例试跑 2.0</button><button data-overview-view="validation" class="secondary-button">查看验证规则</button></div></section>
+    ${renderVersionLegend()}
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮模型测试</p><h2>把历史回放与前瞻预测分开查看</h2><p>五个历史案例只描述样本内方向一致性；两个和铂案例的概率输出已经锁定，但数值判定阈值、最小样本量与最迟观察日期仍待完整锁定。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-overview-view="cases2"><span>概率输出已锁定 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases2"><span>样本内回放</span><strong>5 个历史案例</strong><small>4例方向一致，1例方向不一致</small></button></div><div class="case-entry-actions"><button data-overview-view="cases2" class="primary-button">查看案例试跑 2.0</button><button data-overview-view="validation" class="secondary-button">查看验证规则</button></div></section>
     ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
@@ -950,7 +985,7 @@ const caseStudyV2ForwardCriteria = {
     success: "预设ORR / PFS标准得到重复，并且严重毒性负担没有抵消净临床获益。",
     failure: "预设疗效门槛未达到，或安全性使净临床获益不足。",
     unknown: "未采用目标富集人群、方案发生实质变化，或截止日前没有足够可评价患者。",
-    status: "框架已写明 · 数值阈值待锁定"
+    status: "概率输出已锁定 · 判定标准待完整锁定"
   },
   HBM1020: {
     population: "HHLA2高表达，并优先观察PD-L1阴性或PD-1耐药人群",
@@ -959,7 +994,7 @@ const caseStudyV2ForwardCriteria = {
     success: "在足够暴露下出现超出疾病稳定的确认性疗效，并与HHLA2或机制标志物一致。",
     failure: "足够暴露和可评价样本下仍无可确认缓解，或缺少机制一致的生物标志物变化。",
     unknown: "未进行生物标志物富集、样本不足，或开发路径改为无法与当前预测比较的联合方案。",
-    status: "框架已写明 · 数值阈值待锁定"
+    status: "概率输出已锁定 · 判定标准待完整锁定"
   }
 };
 
@@ -1046,9 +1081,9 @@ function renderCaseStudiesV2() {
     actual: "尚未揭示",
     outcome: "待验证",
     outcomeClass: "pending",
-    strategy: "已锁定",
+    strategy: "概率输出已锁定",
     strategyClass: "locked",
-    note: `${item.recommendation}。未来只按预先定义的确认性里程碑评分，旧输出不得被新证据覆盖。`,
+    note: `${item.recommendation}。概率与区间已经锁定；数值阈值、最小样本量和最迟观察日期补齐后，才进入可独立评分状态。旧输出不得被新证据覆盖。`,
     criteria: caseStudyV2ForwardCriteria[item.id],
     raw: item
   }));
@@ -1056,16 +1091,16 @@ function renderCaseStudiesV2() {
   const aligned = historicalRows.filter(item => item.outcomeClass === "aligned").length;
   const falsePositive = historicalCases.filter(item => item.backtestResult.predictedSuccess && !item.backtestResult.actualSuccess).length;
   const falseNegative = historicalCases.filter(item => !item.backtestResult.predictedSuccess && item.backtestResult.actualSuccess).length;
-  root.innerHTML = `<section class="case2-hero panel"><div><p class="eyebrow">Real-world pilot 2.0 · 诚实评估协议</p><h2>把系统答案和真实答案彻底分开</h2><p>当前规则暂时冻结。五个历史案例只做样本内方向回放；两个和铂案例作为前瞻预测锁定，等待未来真实结果。两类数据不混算。</p><div class="case2-actions"><button data-cases2-view="registry" class="primary-button">查看锁定记录</button></div></div><aside><span>当前结论</span><strong>模型尚未完成独立验证</strong><p>现在可以讨论逻辑、错误和预测记录，但不能宣称未来准确率。</p></aside></section>
-    <section class="case2-score-grid"><article class="panel"><span>当前规则</span><strong>${historicalBacktestModel.version}</strong><small>暂不按单个答案改权重</small></article><article class="panel"><span>历史样本内回放</span><strong>${historicalRows.length}</strong><small>不计作独立验证集</small></article><article class="panel"><span>样本内方向一致</span><strong>${aligned} / ${historicalRows.length}</strong><small>${Math.round(aligned / historicalRows.length * 100)}%仅描述当前五例</small></article><article class="panel"><span>前瞻预测已锁定</span><strong>${forwardRows.length}</strong><small>等待未来结果</small></article><article class="panel"><span>成熟前瞻结果</span><strong>0</strong><small>独立准确率暂无</small></article><article class="panel"><span>可独立评分策略</span><strong>0</strong><small>公司已知行动不计模型命中</small></article></section>
+  root.innerHTML = `<section class="case2-hero panel"><div><p class="eyebrow">Real-world pilot 2.0 · 诚实评估协议</p><h2>把系统答案和真实答案彻底分开</h2><p>当前规则暂时冻结。五个历史案例只做样本内方向回放；两个和铂案例的概率与区间已经锁定，但判定阈值、最小样本量和最迟观察日期尚待补齐。两类数据不混算。</p><div class="case2-actions"><button data-cases2-view="registry" class="primary-button">查看锁定记录</button></div></div><aside><span>当前结论</span><strong>模型尚未完成独立验证</strong><p>现在可以讨论逻辑、错误和预测记录，但不能宣称未来准确率。</p></aside></section>
+    <section class="case2-score-grid"><article class="panel"><span>当前规则</span><strong>${historicalBacktestModel.version}</strong><small>暂不按单个答案改权重</small></article><article class="panel"><span>历史样本内回放</span><strong>${historicalRows.length}</strong><small>不计作独立验证集</small></article><article class="panel"><span>样本内方向一致</span><strong>${aligned} / ${historicalRows.length}</strong><small>${Math.round(aligned / historicalRows.length * 100)}%仅描述当前五例</small></article><article class="panel"><span>前瞻概率输出已锁定</span><strong>${forwardRows.length}</strong><small>判定标准尚待补齐</small></article><article class="panel"><span>成熟前瞻结果</span><strong>0</strong><small>独立准确率暂无</small></article><article class="panel"><span>可独立评分策略</span><strong>0</strong><small>公司已知行动不计模型命中</small></article></section>
     <section class="case2-boundary"><article class="panel can-say"><span>现在可以说</span><h3>模型在当前五个历史样本中，结果方向一致4例、不一致1例</h3><p>其中假阳性 ${falsePositive}、假阴性 ${falseNegative}；这是一项描述性结果。</p></article><article class="panel cannot-say"><span>现在不能说</span><h3>“模型准确率80%”或“策略建议已经被验证”</h3><p>历史样本参与了规则讨论，部分策略又已出现在公司行动中，不满足独立盲法验证。</p></article></section>
     <section class="case2-protocol panel"><div class="panel-head"><div><p class="eyebrow">三个指标，不能混算</p><h2>结果方向、策略质量、未来准确率分别记账</h2></div><span class="draft-badge">评估协议 v2.0</span></div><div><article><span>01</span><h3>结果方向</h3><p>只比较冻结概率方向与后来成功/失败。历史五例可以描述，但不外推。</p></article><article><span>02</span><h3>策略建议</h3><p>只有公司实际行动未出现在模型输入里，才有资格评价系统是否独立提出正确策略。</p></article><article><span>03</span><h3>前瞻预测</h3><p>预测锁定后等待真实结果；这才是未来估计模型准确率的核心数据。</p></article></div></section>
     <section class="case2-method-map panel"><div class="panel-head"><div><p class="eyebrow">从证据到答案</p><h2>2.0 的计算逻辑没有被省略，只是默认折叠</h2><p>每个案例都沿同一条链运行；下方点击“查看本案例的模型计算逻辑”，可以追到每项证据如何改变结论。</p></div><span class="draft-badge">可解释计算链</span></div><div class="case2-method-flow"><article><span>01</span><h3>锁定证据</h3><p>只读取截止日前的公开事实，并标出缺失与冲突。</p><b>公开事实</b></article><i></i><article><span>02</span><h3>STEP 1 海选</h3><p>先查不可逆缺陷，再判断科学、分子与开发路径是否可救。</p><b>规则 + 人工编码</b></article><i></i><article><span>03</span><h3>STEP 2 概率</h3><p>历史回测使用先验赔率×证据乘数；前瞻案例暂用显式半定量情景。</p><b>自动公式 / 研究性参数</b></article><i></i><article><span>04</span><h3>STEP 3 建议</h3><p>把主要负向因素转成可检验的调整杠杆，并写明停止规则。</p><b>规则触发 + 研究员解释</b></article></div><div class="case2-method-note"><b>当前边界</b><span>五个历史案例可以查看完整乘数轨迹；两个和铂案例的区间尚未由外部训练集校准，因此会明确标成“研究性半定量”，不会包装成全自动模型。</span></div></section>
     <section class="case2-list"><div class="overview-section-head"><div><p class="eyebrow">A · Historical replay</p><h2>5个历史案例 · 只计样本内方向一致性</h2></div><span>4例方向一致 · 1例方向不一致</span></div><div class="case2-record-head"><span>案例</span><span>系统冻结输出</span><span>真实结果</span><span>结果方向</span><span>策略建议</span><span>差异与复盘</span></div>${historicalRows.map(item => renderRecord(item, "history")).join("")}</section>
-    <section class="case2-list forward-list"><div class="overview-section-head"><div><p class="eyebrow">B · Prospective locked tests</p><h2>2个前瞻预测 · 等待答案</h2></div><span>不允许用新证据覆盖旧输出</span></div><div class="case2-record-head"><span>案例</span><span>系统冻结输出</span><span>真实结果</span><span>结果方向</span><span>策略建议</span><span>差异与复盘</span></div>${forwardRows.map(item => renderRecord(item, "forward")).join("")}</section>
+    <section class="case2-list forward-list"><div class="overview-section-head"><div><p class="eyebrow">B · Prospective locked outputs</p><h2>2个前瞻预测 · 等待答案</h2></div><span>概率与区间已锁定 · 判定标准待补全</span></div><div class="case2-record-head"><span>案例</span><span>系统冻结输出</span><span>真实结果</span><span>结果方向</span><span>策略建议</span><span>差异与复盘</span></div>${forwardRows.map(item => renderRecord(item, "forward")).join("")}</section>
     <section class="case2-criteria"><div class="overview-section-head"><div><p class="eyebrow">Pre-specified evaluation</p><h2>两个前瞻案例将来怎样判定对错</h2></div><span>结果公布前先锁定标准</span></div><div class="case2-criteria-grid">${forwardRows.map(item=>`<article class="panel"><header><div><span>前瞻判定框架</span><h3>${item.asset}</h3></div><b>${item.criteria.status}</b></header><dl><div><dt>验证人群</dt><dd>${item.criteria.population}</dd></div><div><dt>验证里程碑</dt><dd>${item.criteria.milestone}</dd></div><div><dt>观察窗口</dt><dd>${item.criteria.window}</dd></div><div class="criteria-success"><dt>怎样算成功</dt><dd>${item.criteria.success}</dd></div><div class="criteria-failure"><dt>怎样算失败</dt><dd>${item.criteria.failure}</dd></div><div class="criteria-unknown"><dt>怎样算无法判断</dt><dd>${item.criteria.unknown}</dd></div></dl></article>`).join("")}</div><div class="criteria-warning"><b>当前边界</b><span>判定框架已经写清，但具体数值阈值、最迟观察日期和最小样本量仍需在读取未来结果前锁定；完成前，这两个案例只叫“前瞻记录”，暂不计算准确率。</span></div></section>
     <section class="case2-rules panel"><div><p class="eyebrow">后续复盘规则</p><h2>错了可以改模型，但不能改历史答案</h2><p>每次升级都生成新版本；旧预测、证据截止日和真实结果永久保留，避免“看着答案写答案”。</p></div><ol><li><b>先锁定</b><span>概率、区间、方向、策略和成功定义一起保存。</span></li><li><b>再揭示</b><span>结果成熟后才填写真实答案和差异。</span></li><li><b>批量校准</b><span>积累一批案例后统一升级，不按单个案例追着答案调参。</span></li></ol></section>
-    ${disclosure("查看旧版1.0的方法演变", "旧版只用于复盘表达与方法边界，不参与准确率计算。", `<div class="case2-archive-link"><p>旧版保留了早期将公司事实、系统建议和后来结果放在同一页面的方式。它帮助我们看见方法如何改进，但不再作为正式测试页面。</p><button data-cases2-view="cases" class="secondary-button">打开旧版1.0</button></div>`, false, "case2-archive")}`;
+    ${disclosure("查看内部方法演变档案（旧版1.0）", "仅供内部复盘，不参与当前准确率、策略命中或前瞻验证。", `<div class="case2-archive-link"><p>该档案保留早期将公司事实、系统建议和后来结果放在同一页面的表达方式，用于追踪方法如何改进。对外阅读与正式测试均以2.0为准。</p><button data-cases2-view="cases" class="secondary-button">打开内部只读档案</button></div>`, false, "case2-archive")}`;
   document.querySelectorAll("[data-cases2-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.cases2View)));
 }
 
@@ -1855,12 +1890,19 @@ function renderRegistry() {
 
 function renderEvidence() {
   const filtered = evidenceFilter === "ALL" ? evidence : evidence.filter(e => e.tag === evidenceFilter);
+  const evidenceRows = filtered.map(e => {
+    const audit = getEvidenceAuditRecord(e, evidence.indexOf(e));
+    const source = audit.primarySources.length
+      ? `<div class="evidence-source-links"><strong>${e.source}</strong>${audit.primarySources.map(sourceItem=>`<a class="evidence-source-link" href="${sourceItem.url}" target="_blank" rel="noreferrer"><span>${sourceItem.tier}</span><small>${sourceItem.title} · 打开原始来源</small></a>`).join("")}</div>`
+      : `<span class="evidence-source-text"><strong>${e.source}</strong><small>内部规则记录，或精确原始链接待补录</small></span>`;
+    return `<tr><td><strong class="evidence-id">${audit.id}</strong><span class="source-tag source-${e.tag.toLowerCase()}">[${e.tag}]</span></td><td><strong>${e.asset}</strong><br><span class="audit-note">${e.claim}</span></td><td>${source}</td><td>${e.quality}</td><td class="evidence-audit-cell"><small>证据截止</small><strong>${audit.cutoff}</strong><small>结构化更新 ${audit.updated}</small><small>本次读取 ${audit.accessed}</small></td></tr>`;
+  }).join("");
   root.innerHTML = `<div class="view-heading"><div><h2>让每一个判断都能回到来源、时间与模型版本</h2><p>事实、案例反推、外部一级来源和扩展逻辑必须分开；低等级来源只能触发研究，不能单独形成淘汰结论。</p></div></div>
     <section class="panel data-plan"><div class="data-plan-head"><div><p class="eyebrow">Planned Data Foundation · 计划数据库</p><h2>未来投入使用时，数据从哪里来、怎样进入计算</h2><p>这是目标架构，不代表所有接口已经接通。先建设临床、监管与公司披露三类主干，再逐步加入科学、权属和授权导入的尽调数据。</p></div><span class="draft-badge">规划中 · 分批接入</span></div><div class="data-source-grid">${plannedDataSources.map(source=>`<article class="source-${source.key}"><div><span>${source.status}</span><h3>${source.name}</h3></div><p>${source.sources}</p><dl><div><dt>提取字段</dt><dd>${source.fields}</dd></div><div><dt>更新节奏</dt><dd>${source.cadence}</dd></div><div><dt>进入系统</dt><dd>${source.role}</dd></div></dl></article>`).join("")}</div><div class="data-pipeline"><div><b>进入计算前的六个检查点</b><span>任何关键来源缺失、冲突或不可追溯，都只能降低置信度或触发补证据，不能自动判定为失败。</span></div><div class="data-pipeline-flow">${evidencePipeline.map(([no,title,note],index)=>`<article><span>${no}</span><b>${title}</b><small>${note}</small></article>${index<evidencePipeline.length-1?"<i></i>":""}`).join("")}</div></div><div class="data-record-fields"><b>每条数据必须同时保存</b><span>原始链接</span><span>发布机构</span><span>发布日期</span><span>读取日期</span><span>证据截止日</span><span>原文页码</span><span>证据等级</span><span>人工复核</span><span>冲突状态</span><span>影响维度</span></div></section>
     <section class="evidence-lineage panel"><div class="evidence-lineage-head"><div><p class="eyebrow">Evidence Lineage</p><h2>证据怎样进入最终结论</h2></div><span>每一层都保留来源与转换规则</span></div><div class="lineage-flow"><article><span>01</span><b>Raw Evidence</b><small>论文、试验、监管、公司、遗传学</small></article><i></i><article><span>02</span><b>Claim</b><small>抽取可验证的事实主张</small></article><i></i><article><span>03</span><b>Factor</b><small>映射到 Biology、PK、Safety 等变量</small></article><i></i><article><span>04</span><b>Probability</b><small>按阶段和证据质量进入概率模型</small></article><i></i><article><span>05</span><b>Decision</b><small>形成 Gate、排序、情景与下一项实验</small></article></div><div class="lineage-example"><b>示例</b><span>人体遗传学研究</span><em>→</em><span>靶点—疾病因果支持</span><em>→</em><span>Target Validation</span><em>→</em><span>机制节点概率</span><em>→</em><span>PoS 区间</span></div></section>
     <div class="source-policy-grid">${sourcePolicy.map(item => `<article class="panel source-policy-card"><span>${item.tier}</span><div><h3>${item.title}</h3><p>${item.sources}</p><small>${item.use}</small></div></article>`).join("")}</div>
     <div class="evidence-layout"><aside class="panel evidence-filter"><p class="eyebrow">证据标签</p><h2>证据类型</h2>${[["ALL","全部"],["F","[F] Formation 直接公开"],["C","[C] 案例反推"],["P","[P] 外部一级来源"],["E","[E] 扩展逻辑"]].map(([k,v]) => `<button data-filter="${k}" class="${evidenceFilter===k?"active":""}"><span>${v}</span><b>${k==="ALL"?evidence.length:evidence.filter(e=>e.tag===k).length}</b></button>`).join("")}</aside>
-      <section class="panel table-wrap"><table class="evidence-table"><thead><tr><th>类型</th><th>对象 / Claim</th><th>来源</th><th>质量</th><th>更新</th></tr></thead><tbody>${filtered.map(e => `<tr><td><span class="source-tag source-${e.tag.toLowerCase()}">[${e.tag}]</span></td><td><strong>${e.asset}</strong><br><span class="audit-note">${e.claim}</span></td><td>${e.source}</td><td>${e.quality}</td><td>${e.updated}</td></tr>`).join("")}</tbody></table></section></div>`;
+      <section class="panel table-wrap"><table class="evidence-table"><thead><tr><th>证据ID / 类型</th><th>对象 / Claim</th><th>来源与原始链接</th><th>质量</th><th>审计时间</th></tr></thead><tbody>${evidenceRows}</tbody></table></section></div>`;
   wrapElementInDisclosure(document.querySelector(".source-policy-grid"), "查看证据等级规则", "哪些来源可以形成结论，哪些只能触发进一步研究。", false);
   wrapElementInDisclosure(document.querySelector(".evidence-layout"), "查看全部证据记录", "按事实、案例反推、外部来源与扩展逻辑筛选。", false);
   document.querySelectorAll("[data-filter]").forEach(btn => btn.addEventListener("click", () => { evidenceFilter = btn.dataset.filter; renderEvidence(); }));
