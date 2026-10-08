@@ -547,6 +547,16 @@ const silentAssetWatchlist = [
     inference: "更像需要核查的组合级降优先、披露口径变化或项目迁移信号；现有公开证据不足以判定暂停或终止。",
     alternatives: ["公司网页尚未与最新融资文件同步", "同类资源可能向KM501等项目集中", "早期数据尚不足以进入重点管线披露"],
     nextCheck: "核查试验登记更新、后续财报、会议摘要与公司正式状态说明。",
+    modelDisposition: "有条件重构；先证明与KM501的差异，否则停止重复投入",
+    dispositionClass: "conditional",
+    recommendation: "优先做管线角色重组，不急于增加联合药物。把KM257聚焦到HER2高表达或明确扩增人群，同时与KM501直接比较机制、内化、人体暴露、安全窗和适用HER2阈值。",
+    scenarios: [
+      { label: "优先方案", title: "患者 / Biomarker 聚焦PoC", detail: "从泛HER2实体瘤收窄到最可能产生清晰信号的HER2高表达或扩增人群，并限定一个核心瘤种。" },
+      { label: "管线方案", title: "与KM501明确分工", detail: "KM257只有在安全性、免疫效应或特定HER2生物学上形成独立优势时才保留；否则合并资源。" },
+      { label: "条件方案", title: "机制证据触发联合", detail: "只有确认ADCC或免疫激活后，才测试与PD-1或标准治疗联合，不以同类经验替代本分子证据。" }
+    ],
+    evidenceGate: "获得可解释的人体PK/PD、按HER2水平分层的疗效、ADCC/免疫效应、安全窗，以及与KM501的正面对照证据。",
+    stopRule: "若无法证明相对KM501的独立优势，或聚焦人群仍无可重复药效信号，则暂停或停止KM257继续投入。",
     facts: [
       ["2022", "招股书披露该项目进入Ⅰ期临床"],
       ["2024", "四环医药年报仍将其列入创新药管线"],
@@ -557,7 +567,8 @@ const silentAssetWatchlist = [
       ["2022年轩竹生物招股书", "https://static.sse.com.cn/stock/disclosure/announcement/c/202209/001318_20220926_NLE2.pdf"],
       ["2024年四环医药年报", "https://www.hkexnews.hk/listedco/listconews/sehk/2024/0426/2024042600751_c.pdf"],
       ["2025年轩竹生物招股书", "https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1006/2025100600008_c.pdf"],
-      ["轩竹生物研发管线网页", "https://www.xzenithbio.com/development"]
+      ["轩竹生物研发管线网页", "https://www.xzenithbio.com/development"],
+      ["轩竹生物KM501产品页", "https://www.xzenithbio.com/products/203.html"]
     ]
   },
   {
@@ -576,6 +587,16 @@ const silentAssetWatchlist = [
     inference: "管线披露消失、注册信息陈旧且长期无结果，形成较强的状态核查信号；但公司网页仍列示，因此不能推断为科学失败。",
     alternatives: ["罕见融合人群导致入组缓慢", "项目仍低速推进但不是融资披露重点", "项目代码或披露口径发生变化"],
     nextCheck: "优先核查CDE登记、中心招募状态、近年学术会议和公司最新正式披露。",
+    modelDisposition: "有条件聚焦；若无耐药突变或CNS差异，则优先合作或停止",
+    dispositionClass: "review-stop",
+    recommendation: "优先重构患者与试验架构，而不是机械增加联合用药。把NTRK与ROS1分开评估，并将开发价值集中在既往TKI治疗后的耐药突变、CNS转移或明确安全性优势。",
+    scenarios: [
+      { label: "优先方案", title: "NTRK / ROS1 分队列", detail: "按靶点、既往TKI暴露、融合伙伴和耐药突变分层，分别设定基准疗法与成功标准。" },
+      { label: "差异方案", title: "耐药突变或CNS聚焦", detail: "只有非临床与早期人体证据证明突变覆盖或脑渗透优势，才进入相应扩展队列。" },
+      { label: "退出方案", title: "合作转让或停止", detail: "若差异不足且罕见人群导致独立开发经济性不成立，优先区域合作；合作也不成立则停止。" }
+    ],
+    evidenceGate: "补齐耐药突变谱、脑渗透与颅内活性、相对已上市TKI的选择性/安全性、实际入组速度和初步人体疗效。",
+    stopRule: "若不能证明耐药、CNS或安全性中的至少一项明确差异，且分子筛查网络无法支持入组，则不再维持宽泛NTRK/ROS1开发路径。",
     facts: [
       ["2021", "NCT04996121 / CTR20211858启动Ⅰ/Ⅱ期研究"],
       ["2022", "ClinicalTrials.gov最后一次公开更新"],
@@ -586,7 +607,9 @@ const silentAssetWatchlist = [
       ["ClinicalTrials.gov · NCT04996121", "https://clinicaltrials.gov/study/NCT04996121"],
       ["2024年四环医药年报", "https://www.hkexnews.hk/listedco/listconews/sehk/2024/0426/2024042600751_c.pdf"],
       ["2025年轩竹生物招股书", "https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1006/2025100600008_c.pdf"],
-      ["轩竹生物研发管线网页", "https://www.xzenithbio.com/development"]
+      ["轩竹生物研发管线网页", "https://www.xzenithbio.com/development"],
+      ["FDA · ROS1 TKI治疗后人群", "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-repotrectinib-ros1-positive-non-small-cell-lung-cancer"],
+      ["FDA · NTRK融合实体瘤", "https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-repotrectinib-adult-and-pediatric-patients-ntrk-gene-fusion-positive"]
     ]
   }
 ];
@@ -616,8 +639,10 @@ const evidence = [
   { tag: "E", asset: "STEP 1 海选优先分", claim: "海选后优先分用于研究资源排序，不替代 STEP 2 的风险调整价值比较。", source: "v0.4 方法规范", quality: "模型规则", updated: "2026-10" },
   { tag: "P", asset: "XZP-KM257", claim: "2024年法定年报仍列示该项目；2025年轩竹生物招股书当前管线未列示，但公司研发网页仍列示。", source: "四环医药年报 / 轩竹生物招股书与研发网页", quality: "法定披露与公司网页交叉核验", updated: "2026-10" },
   { tag: "E", asset: "XZP-KM257", claim: "系统只将披露冲突标记为状态核查触发器，不推断项目暂停、终止或科学失败。", source: "状态观察规则 v1.0", quality: "模型推断 · 待后续核实", updated: "2026-10" },
+  { tag: "E", asset: "XZP-KM257", claim: "模型建议先验证KM257与KM501的管线差异，再决定聚焦、联合或停止；这属于重构假设，不是公司已采取的行动。", source: "沉默资产重构规则 v0.1", quality: "模型建议 · 待验证", updated: "2026-10" },
   { tag: "P", asset: "XZP-5955", claim: "2024年法定年报仍列示该项目；2025年招股书当前管线未列示；NCT04996121最近一次公开更新停留在2022年且无结果。", source: "四环医药年报 / 轩竹生物招股书 / ClinicalTrials.gov", quality: "法定披露与试验登记交叉核验", updated: "2026-10" },
   { tag: "E", asset: "XZP-5955", claim: "长期登记静默与管线披露消失共同触发高优先级核查，但公司网页仍列示，因此不能据此判断项目已失败。", source: "状态观察规则 v1.0", quality: "模型推断 · 待后续核实", updated: "2026-10" },
+  { tag: "E", asset: "XZP-5955", claim: "模型建议拆分NTRK与ROS1队列，优先验证耐药突变、CNS或安全性差异；若均不成立，则转向合作或停止。", source: "沉默资产重构规则 v0.1", quality: "模型建议 · 待验证", updated: "2026-10" },
   { tag: "E", asset: "沉默资产观察规则", claim: "披露消失、长期未更新或来源冲突只能触发状态核查；只有公司、监管或可验证试验事实才能确认暂停、终止或失败。", source: "状态观察规则 v1.0", quality: "模型规则", updated: "2026-10" }
 ];
 
@@ -811,9 +836,15 @@ const opportunitySignals = [
 
 function renderSilentWatchCard(item, compact = false) {
   const sourceLinks = item.sources.map(([title, url]) => `<a href="${url}" target="_blank" rel="noreferrer">${title}</a>`).join("");
+  const scenarioCards = item.scenarios.map(scene => `<article><span>${scene.label}</span><h4>${scene.title}</h4><p>${scene.detail}</p></article>`).join("");
   return `<article class="silent-watch-card ${compact ? "compact" : ""}">
     <header><div><span>真实公开信号 · 非失败结论</span><h3>${item.asset}</h3><p>${item.company} · ${item.target}</p></div><b class="watch-status ${item.statusClass}">${item.systemStatus}</b></header>
     <div class="watch-answer"><span>系统当前答案</span><strong>${item.inference}</strong></div>
+    <section class="watch-strategy">
+      <div class="watch-strategy-head"><div><span>模型建议 · 待验证</span><strong>${item.modelDisposition}</strong></div><b class="disposition ${item.dispositionClass}">${item.dispositionClass === "conditional" ? "有条件重构" : "聚焦 / 退出并行"}</b></div>
+      <p>${item.recommendation}</p>
+      ${compact ? `<div class="watch-compact-decision"><b>优先动作</b><span>${item.scenarios[0].title}</span><b>停止规则</b><span>${item.stopRule}</span></div>` : `<div class="watch-scenarios">${scenarioCards}</div><div class="watch-gates"><div><b>进入下一步所需证据</b><span>${item.evidenceGate}</span></div><div class="stop"><b>停止规则</b><span>${item.stopRule}</span></div></div>`}
+    </section>
     <div class="watch-timeline">${item.facts.map(([year, fact]) => `<div><b>${year}</b><span>${fact}</span></div>`).join("")}</div>
     <div class="watch-metrics"><div><span>信号强度</span><strong>${item.signalStrength}</strong></div><div><span>判断置信度</span><strong>${item.confidence}</strong></div><div><span>公开状态</span><strong>${item.publicStatus}</strong></div></div>
     ${compact ? `<div class="watch-next"><b>下一步核查</b><span>${item.nextCheck}</span></div>` : `<div class="watch-detail-grid"><div><b>不能排除的其他解释</b><ul>${item.alternatives.map(text => `<li>${text}</li>`).join("")}</ul></div><div><b>下一步核查</b><p>${item.nextCheck}</p></div></div><div class="watch-source-links"><span>公开来源</span>${sourceLinks}</div>`}
@@ -831,7 +862,7 @@ function renderRadar() {
     <section class="radar-source-map"><article class="panel"><span>01</span><h3>持续监听</h3><p>试验、论文、监管、公司、交易、遗传学和竞争管线。</p></article><article class="panel"><span>02</span><h3>计算变化</h3><p>新增、消失、语气、频率、状态和相互矛盾的信息。</p></article><article class="panel"><span>03</span><h3>生成触发器</h3><p>信号只决定是否进入研究，不直接决定资产好坏。</p></article><article class="panel"><span>04</span><h3>进入 STEP 1</h3><p>由海选规则判断淘汰、证据不足、可救或值得深入评估。</p></article></section>
     <div class="radar-principle"><div><b>STEP 0 优化 Recall</b><span>尽量不漏掉值得看的机会</span></div><i></i><div><b>STEP 1 优化 Precision</b><span>尽量不把不合格资产送入正式尽调</span></div></div>
     <div class="summary-strip"><div class="panel summary-card" style="--card-color:var(--blue)"><span>规则演示信号</span><strong>${opportunitySignals.length}</strong><small>用于说明监测结构</small></div><div class="panel summary-card" style="--card-color:var(--teal)"><span>真实观察对象</span><strong>${silentAssetWatchlist.length}</strong><small>国内公开状态核查</small></div><div class="panel summary-card" style="--card-color:var(--amber)"><span>同批候选筛查</span><strong>10</strong><small>保留2个高信息案例</small></div><div class="panel summary-card" style="--card-color:var(--red)"><span>直接判定失败</span><strong>0</strong><small>沉默不等于失败</small></div></div>
-    <section class="silent-watch-intro panel"><div><p class="eyebrow">Domestic silent-asset watchlist</p><h2>国内未官宣终止、但公开状态出现断点的资产</h2><p>系统比较法定披露、公司管线页和试验登记的时间序列，只输出“是否需要核查”和可能解释。它们不是失败案例，也不进入模型准确率。</p></div><div class="watch-legend"><span><i class="conflict"></i>披露冲突</span><span><i class="watch"></i>长期静默</span><span><i class="fact"></i>公开事实</span><span><i class="inference"></i>模型推断</span></div></section>
+    <section class="silent-watch-intro panel"><div><p class="eyebrow">Domestic silent-asset watchlist</p><h2>国内未官宣终止、但公开状态出现断点的资产</h2><p>系统先识别披露断点，再生成“重构、补证、合作或停止”的行动建议。它们不是失败案例；建议属于待验证的模型输出，不进入当前准确率。</p></div><div class="watch-legend"><span><i class="conflict"></i>披露冲突</span><span><i class="watch"></i>长期静默</span><span><i class="fact"></i>公开事实</span><span><i class="inference"></i>模型建议</span></div></section>
     <section class="silent-watch-grid">${silentAssetWatchlist.map(item => renderSilentWatchCard(item)).join("")}</section>
     <section class="panel radar-workspace"><div class="panel-head"><div><h2>机会信号队列</h2><p>分析“说了什么”，也分析“突然不再说什么”</p></div><div class="radar-filters">${Object.entries(radarTypes).map(([key,label])=>`<button data-radar-filter="${key}" class="${radarFilter===key?"active":""}">${label}</button>`).join("")}</div></div><div class="radar-list">${rows.map(item=>`<article class="radar-card"><div class="radar-score"><strong>${item.strength}</strong><span>信号强度</span></div><div class="radar-main"><div><span class="signal-type signal-${item.type}">${radarTypes[item.type]}</span><small>${item.id} · ${item.source}</small></div><h3>${item.asset}</h3><p>${item.signal}</p><em>${item.change}</em></div><div class="radar-reason"><span>为什么值得看</span><p>${item.why}</p><small>来源置信度 ${item.confidence}%</small></div><div class="radar-action"><span>下一步</span><strong>${item.action}</strong><button data-view="recoverability">打开海选逻辑</button></div></article>`).join("")}</div></section>`;
   wrapElementInDisclosure(document.querySelector(".radar-workspace"), "查看全部机会信号", "信号只决定是否进入研究，不直接决定资产好坏。", false);
@@ -924,7 +955,7 @@ function renderWorkspace() {
   root.innerHTML = `<section class="clarity-hero panel"><div><p class="eyebrow">一套系统，只回答六个问题</p><h2>把复杂的资产判断，变成一条可以验证的决策路径</h2><p>先看每一步解决什么问题，再按需要展开计算、指标和证据。页面负责让人看懂；底层逻辑仍完整保留。</p><div class="overview-actions"><button data-overview-view="cases2" class="primary-button">查看真实案例试跑 2.0</button><button data-overview-view="recoverability" class="secondary-button">从海选逻辑开始</button></div></div><aside><span>当前版本</span><strong>模型验证期</strong><p>决策逻辑已成型，正在锁定规则并用独立案例检验预测能力。</p></aside></section>
     <section class="question-journey"><div class="overview-section-head"><div><p class="eyebrow">30秒看懂</p><h2>从发现机会，到验证模型</h2></div><span>点击任何一步进入详细页面</span></div><div class="question-journey-grid">${journeyQuestions.map(item=>`<button data-overview-view="${item.view}" ${item.section?`data-step2-section-target="${item.section}"`:""}><span>${item.no}</span><small>${item.step}</small><h3>${item.title}</h3><p>${item.answer}</p><b>${item.output}</b></button>`).join("")}</div><div class="journey-feedback"><b>双重闭环</b><span>STEP 3 把新方案回写 STEP 2；STEP 4 用真实结果检查模型，只在整批验证后统一校准。</span></div></section>
     ${renderVersionLegend()}
-    <section class="case-entry panel"><div><p class="eyebrow">第一轮模型测试</p><h2>把三类问题分开验证</h2><p>五个历史案例只描述样本内方向一致性；两个和铂案例等待未来结果；两个国内沉默项目只检验公开状态识别，不进入准确率。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-overview-view="cases2"><span>概率输出已锁定 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases2"><span>状态观察 · 不计准确率</span><strong>2 个国内沉默资产</strong><small>披露冲突与长期静默</small></button><button data-overview-view="cases2"><span>样本内回放</span><strong>5 个历史案例</strong><small>4例方向一致，1例方向不一致</small></button></div><div class="case-entry-actions"><button data-overview-view="cases2" class="primary-button">查看案例试跑 2.0</button><button data-overview-view="validation" class="secondary-button">查看验证规则</button></div></section>
+    <section class="case-entry panel"><div><p class="eyebrow">第一轮模型测试</p><h2>把三类问题分开验证</h2><p>五个历史案例只描述样本内方向一致性；两个和铂案例等待未来结果；两个国内沉默项目检验状态识别，并生成重构、合作或停止建议，不进入准确率。</p></div><div class="case-entry-assets">${realCases.slice(0,2).map(item=>`<button data-overview-view="cases2"><span>概率输出已锁定 · ${item.stage}</span><strong>${item.asset}</strong><small>${item.verdict}</small></button>`).join("")}<button data-overview-view="cases2"><span>状态观察 + 模型建议</span><strong>2 个国内沉默资产</strong><small>重构、补证、合作或停止</small></button><button data-overview-view="cases2"><span>样本内回放</span><strong>5 个历史案例</strong><small>4例方向一致，1例方向不一致</small></button></div><div class="case-entry-actions"><button data-overview-view="cases2" class="primary-button">查看案例试跑 2.0</button><button data-overview-view="validation" class="secondary-button">查看验证规则</button></div></section>
     ${disclosure("查看当前演示资产池", "这是计算结构演示，不代表真实资产结论。", `<div class="workspace-grid"><section class="panel"><div class="panel-head"><div><h2>演示资产</h2><p>用于检查交互和计算链是否工作</p></div><div class="filter-row"><input id="asset-search" class="search-box" type="search" placeholder="搜索资产或靶点" aria-label="搜索资产或靶点" /><select id="stage-filter" class="select-box" aria-label="按阶段筛选"><option value="ALL">全部阶段</option><option>Preclinical</option><option>Phase 1</option><option>Phase 2</option></select></div></div><div id="asset-table-root">${assetTable()}</div></section>${detailPanel(selected)}</div>`)}`;
   wireWorkspace();
 }
@@ -1172,12 +1203,12 @@ function renderCaseStudiesV2() {
   const aligned = historicalRows.filter(item => item.outcomeClass === "aligned").length;
   const falsePositive = historicalCases.filter(item => item.backtestResult.predictedSuccess && !item.backtestResult.actualSuccess).length;
   const falseNegative = historicalCases.filter(item => !item.backtestResult.predictedSuccess && item.backtestResult.actualSuccess).length;
-  root.innerHTML = `<section class="case2-hero panel"><div><p class="eyebrow">Real-world pilot 2.0 · 诚实评估协议</p><h2>把系统答案和真实答案彻底分开</h2><p>当前分为三类测试：五个历史案例只做样本内方向回放；两个和铂案例锁定概率并等待未来结果；两个国内沉默项目只检验公开状态识别。三类结果不混算。</p><div class="case2-actions"><button data-cases2-view="registry" class="primary-button">查看锁定记录</button></div></div><aside><span>当前结论</span><strong>模型尚未完成独立验证</strong><p>现在可以讨论逻辑、错误、预测记录和状态信号，但不能宣称未来准确率。</p></aside></section>
-    <section class="case2-validation-summary panel"><div class="case2-validation-conclusion"><span>当前验证状态 · 模型验证期</span><h2>现在还不能计算模型准确率</h2><p>历史回放只说明当前样本中的方向是否一致；真正的准确率必须等待锁定后的独立前瞻结果成熟。状态观察只评价是否值得核查，不评价研发成败。</p></div><div class="case2-validation-metrics"><article><span>历史样本回放</span><strong>${historicalRows.length}例</strong><small>方向一致${aligned}例 · 不一致${historicalRows.length-aligned}例</small></article><article><span>前瞻预测锁定</span><strong>${forwardRows.length}例</strong><small>等待真实结果 · 暂不计准确率</small></article><article><span>状态观察</span><strong>${silentAssetWatchlist.length}例</strong><small>只核查公开披露断点</small></article><article><span>独立策略验证</span><strong>0例</strong><small>公司已知行动不计模型命中</small></article></div></section>
+  root.innerHTML = `<section class="case2-hero panel"><div><p class="eyebrow">Real-world pilot 2.0 · 诚实评估协议</p><h2>把系统答案和真实答案彻底分开</h2><p>当前分为三类测试：五个历史案例只做样本内方向回放；两个和铂案例锁定概率并等待未来结果；两个国内沉默项目先识别状态，再生成重构、合作或停止建议。三类结果不混算。</p><div class="case2-actions"><button data-cases2-view="registry" class="primary-button">查看锁定记录</button></div></div><aside><span>当前结论</span><strong>模型尚未完成独立验证</strong><p>现在可以讨论逻辑、错误、预测记录和状态信号，但不能宣称未来准确率。</p></aside></section>
+    <section class="case2-validation-summary panel"><div class="case2-validation-conclusion"><span>当前验证状态 · 模型验证期</span><h2>现在还不能计算模型准确率</h2><p>历史回放只说明当前样本中的方向是否一致；真正的准确率必须等待锁定后的独立前瞻结果成熟。沉默项目的处置建议是待验证假设，不等于研发成败判断。</p></div><div class="case2-validation-metrics"><article><span>历史样本回放</span><strong>${historicalRows.length}例</strong><small>方向一致${aligned}例 · 不一致${historicalRows.length-aligned}例</small></article><article><span>前瞻预测锁定</span><strong>${forwardRows.length}例</strong><small>等待真实结果 · 暂不计准确率</small></article><article><span>状态 + 处置建议</span><strong>${silentAssetWatchlist.length}例</strong><small>重构、合作或停止均可输出</small></article><article><span>独立策略验证</span><strong>0例</strong><small>公司已知行动不计模型命中</small></article></div></section>
     ${disclosure("查看验证口径与边界", `方向一致${aligned}例、不一致${historicalRows.length-aligned}例；不换算成“${Math.round(aligned / historicalRows.length * 100)}%准确率”。`, `<div class="case2-validation-detail"><article><span>结果方向</span><p>只比较冻结概率方向与后来成功或失败。当前假阳性${falsePositive}例、假阴性${falseNegative}例，只作样本内描述。</p></article><article><span>策略质量</span><p>只有公司实际行动未出现在模型输入中，才有资格评价系统是否独立提出正确策略。</p></article><article><span>未来准确率</span><p>预测锁定后等待真实结果，并在一批独立案例成熟后统一计算和校准。</p></article><article class="warning"><span>不能声称</span><p>不能说“模型准确率${Math.round(aligned / historicalRows.length * 100)}%”，也不能说策略建议已经得到验证。</p></article></div>`, false, "case2-validation-disclosure")}
     <section class="case2-list"><div class="overview-section-head"><div><p class="eyebrow">A · Historical replay</p><h2>5个历史案例 · 只计样本内方向一致性</h2></div><span>4例方向一致 · 1例方向不一致</span></div><div class="case2-record-head"><span>案例</span><span>系统冻结输出</span><span>真实结果</span><span>结果方向</span><span>策略建议</span><span>差异与复盘</span></div>${historicalRows.map(item => renderRecord(item, "history")).join("")}</section>
     <section class="case2-list forward-list"><div class="overview-section-head"><div><p class="eyebrow">B · Prospective locked outputs</p><h2>2个前瞻预测 · 等待答案</h2></div><span>概率与区间已锁定 · 判定标准待补全</span></div><div class="case2-record-head"><span>案例</span><span>系统冻结输出</span><span>真实结果</span><span>结果方向</span><span>策略建议</span><span>差异与复盘</span></div>${forwardRows.map(item => renderRecord(item, "forward")).join("")}</section>
-    <section class="case2-list silent-observation-list"><div class="overview-section-head"><div><p class="eyebrow">C · Status observations</p><h2>2个国内沉默资产 · 只验证状态识别</h2></div><span>不预测成败 · 不进入准确率</span></div><div class="status-observation-boundary"><b>系统只回答</b><span>公开状态是否出现值得核查的断点，以及下一步应该找什么证据。</span><b>系统不回答</b><span>项目是否已经失败、公司是否已经放弃，或未来成功概率是多少。</span></div><div class="silent-watch-grid compact-grid">${silentAssetWatchlist.map(item => renderSilentWatchCard(item, true)).join("")}</div></section>
+    <section class="case2-list silent-observation-list"><div class="overview-section-head"><div><p class="eyebrow">C · Status + action hypotheses</p><h2>2个国内沉默资产 · 从状态识别走向处置建议</h2></div><span>允许重构、补证、合作或停止 · 不进入准确率</span></div><div class="status-observation-boundary"><b>系统回答</b><span>哪里出现披露断点、有哪些可验证的重构方向、需要什么证据，以及何时应停止。</span><b>系统不回答</b><span>公司是否已经放弃，或在缺少人体数据时虚构一个精确成功概率。</span></div><div class="silent-watch-grid compact-grid">${silentAssetWatchlist.map(item => renderSilentWatchCard(item, true)).join("")}</div></section>
     <section class="case2-criteria"><div class="overview-section-head"><div><p class="eyebrow">Pre-specified evaluation</p><h2>两个前瞻案例将来怎样判定对错</h2></div><span>结果公布前先锁定标准</span></div><div class="case2-criteria-grid">${forwardRows.map(item=>`<article class="panel"><header><div><span>前瞻判定框架</span><h3>${item.asset}</h3></div><b>${item.criteria.status}</b></header><dl><div><dt>验证人群</dt><dd>${item.criteria.population}</dd></div><div><dt>验证里程碑</dt><dd>${item.criteria.milestone}</dd></div><div><dt>观察窗口</dt><dd>${item.criteria.window}</dd></div><div class="criteria-success"><dt>怎样算成功</dt><dd>${item.criteria.success}</dd></div><div class="criteria-failure"><dt>怎样算失败</dt><dd>${item.criteria.failure}</dd></div><div class="criteria-unknown"><dt>怎样算无法判断</dt><dd>${item.criteria.unknown}</dd></div></dl></article>`).join("")}</div><div class="criteria-warning"><b>当前边界</b><span>判定框架已经写清，但具体数值阈值、最迟观察日期和最小样本量仍需在读取未来结果前锁定；完成前，这两个案例只叫“前瞻记录”，暂不计算准确率。</span></div></section>
     <section class="case2-rules panel"><div><p class="eyebrow">后续复盘规则</p><h2>错了可以改模型，但不能改历史答案</h2><p>每次升级都生成新版本；旧预测、证据截止日和真实结果永久保留，避免“看着答案写答案”。</p></div><ol><li><b>先锁定</b><span>概率、区间、方向、策略和成功定义一起保存。</span></li><li><b>再揭示</b><span>结果成熟后才填写真实答案和差异。</span></li><li><b>批量校准</b><span>积累一批案例后统一升级，不按单个案例追着答案调参。</span></li></ol></section>
     ${disclosure("查看内部方法演变档案（旧版1.0）", "仅供内部复盘，不参与当前准确率、策略命中或前瞻验证。", `<div class="case2-archive-link"><p>该档案保留早期将公司事实、系统建议和后来结果放在同一页面的表达方式，用于追踪方法如何改进。对外阅读与正式测试均以2.0为准。</p><button data-cases2-view="cases" class="secondary-button">打开内部只读档案</button></div>`, false, "case2-archive")}`;

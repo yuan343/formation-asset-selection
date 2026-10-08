@@ -1415,6 +1415,30 @@ dialog::backdrop { background: rgba(8,26,41,.5); backdrop-filter: blur(3px); }
 .watch-answer span,.watch-answer strong { display:block; }
 .watch-answer span { margin-bottom:6px; color:var(--muted); font-size:.64rem; }
 .watch-answer strong { color:#284253; font-size:.76rem; line-height:1.55; }
+.watch-strategy { padding:18px 20px; border-top:1px solid #cce9e2; border-bottom:1px solid #cce9e2; background:#f1fbf8; }
+.watch-strategy-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.watch-strategy-head span,.watch-strategy-head strong { display:block; }
+.watch-strategy-head span { margin-bottom:6px; color:var(--teal); font-size:.64rem; font-weight:900; }
+.watch-strategy-head strong { color:#173c45; font-size:.82rem; line-height:1.45; }
+.watch-strategy > p { margin:10px 0 14px; color:#405d63; font-size:.71rem; line-height:1.6; }
+.disposition { flex:0 0 auto; padding:7px 10px; border-radius:99px; font-size:.62rem; line-height:1.25; }
+.disposition.conditional { color:#087866; background:#d9f3ec; }
+.disposition.review-stop { color:#86520a; background:#ffedc9; }
+.watch-scenarios { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.watch-scenarios article { padding:12px; border:1px solid #d5e9e4; border-radius:9px; background:#fff; }
+.watch-scenarios span,.watch-scenarios h4,.watch-scenarios p { display:block; margin:0; }
+.watch-scenarios span { color:var(--teal); font-size:.59rem; font-weight:900; }
+.watch-scenarios h4 { margin:5px 0; color:#203c47; font-size:.7rem; line-height:1.4; }
+.watch-scenarios p { color:var(--muted); font-size:.64rem; line-height:1.5; }
+.watch-gates { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:9px; }
+.watch-gates > div { padding:11px 12px; border-left:3px solid var(--teal); border-radius:0 8px 8px 0; background:#fff; }
+.watch-gates > div.stop { border-left-color:#db7458; }
+.watch-gates b,.watch-gates span { display:block; }
+.watch-gates b { margin-bottom:5px; color:#284253; font-size:.63rem; }
+.watch-gates span { color:var(--muted); font-size:.64rem; line-height:1.5; }
+.watch-compact-decision { display:grid; grid-template-columns:auto 1fr; gap:7px 10px; padding-top:12px; border-top:1px solid #cce9e2; }
+.watch-compact-decision b { color:#087866; font-size:.62rem; }
+.watch-compact-decision span { color:#405d63; font-size:.66rem; line-height:1.5; }
 .watch-timeline { display:grid; grid-template-columns:repeat(4,1fr); padding:16px 20px; border-bottom:1px solid var(--soft-line); }
 .watch-timeline div { position:relative; min-height:78px; padding:0 10px; border-left:1px solid #d7e2e7; }
 .watch-timeline b,.watch-timeline span { display:block; }
@@ -1440,6 +1464,7 @@ dialog::backdrop { background: rgba(8,26,41,.5); backdrop-filter: blur(3px); }
 .compact-grid { margin-bottom:0; }
 .silent-watch-card.compact .watch-timeline { grid-template-columns:repeat(2,1fr); row-gap:12px; }
 .silent-watch-card.compact .watch-answer strong { min-height:55px; }
+.silent-watch-card.compact .watch-strategy-head strong { max-width:430px; }
 .watch-next { padding:15px 20px 18px; }
 
 .version-disclosure { margin:18px 0; }
@@ -1542,9 +1567,10 @@ dialog::backdrop { background: rgba(8,26,41,.5); backdrop-filter: blur(3px); }
   .case2-criteria-grid dl > div { grid-template-columns:1fr; gap:4px; }
   .version-legend-grid { grid-template-columns:1fr; }
   .version-legend-intro { flex-direction:column; }
-  .silent-watch-grid,.watch-detail-grid { grid-template-columns:1fr; }
-  .silent-watch-card > header,.status-observation-boundary { align-items:flex-start; grid-template-columns:1fr; }
+  .silent-watch-grid,.watch-detail-grid,.watch-scenarios,.watch-gates { grid-template-columns:1fr; }
+  .silent-watch-card > header,.watch-strategy-head,.status-observation-boundary { align-items:flex-start; grid-template-columns:1fr; }
   .silent-watch-card > header { flex-direction:column; }
+  .watch-strategy-head { flex-direction:column; }
   .watch-timeline,.silent-watch-card.compact .watch-timeline { grid-template-columns:1fr; }
   .watch-metrics { grid-template-columns:1fr; gap:10px; }
   .watch-metrics div + div { padding:10px 0 0; border-left:0; border-top:1px solid var(--soft-line); }
